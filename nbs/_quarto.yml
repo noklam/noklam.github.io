@@ -1,0 +1,28 @@
+project:
+  type: website
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+
+website:
+  twitter-card: true
+  open-graph: true
+  repo-actions: [issue]
+  navbar:
+    background: primary
+    search: true
+    right:
+      - about.qmd
+      - icon: github
+        href: https://github.com/noklam
+      - icon: twitter
+        href: https://twitter.com
+  sidebar:
+    style: floating
+  google-analytics: UA-83544344-5
+
+
+metadata-files: [nbdev.yml, sidebar.yml]
