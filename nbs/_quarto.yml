@@ -15,7 +15,9 @@ website:
     background: primary
     search: true
     right:
-      - about.qmd
+      # - about.qmd
+      - text: "Blog"
+        href: blog/index.qmd
       - icon: github
         href: https://github.com/noklam
       - icon: twitter
