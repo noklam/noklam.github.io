@@ -11,10 +11,17 @@ website:
   twitter-card: true
   open-graph: true
   repo-actions: [issue]
+  sidebar:
+    style: floating
+    contents:
+      # - auto: "/*.ipynb"
+      - blog/index.qmd
+
   navbar:
     background: primary
     search: true
-    right:
+    collapse-below: lg
+    left:
       # - about.qmd
       - text: "Blog"
         href: blog/index.qmd
@@ -22,8 +29,7 @@ website:
         href: https://github.com/noklam
       - icon: twitter
         href: https://twitter.com
-  sidebar:
-    style: floating
+
   google-analytics: UA-83544344-5
 
 
