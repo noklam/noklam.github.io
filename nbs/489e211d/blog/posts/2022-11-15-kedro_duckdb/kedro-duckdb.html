@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2022-11-15">
+<meta name="description" content="Kedro Meet the Duck">
+
+<title>noklam.github.io - Testing Kedro with DuckDB</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-83544344-5', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../../../styles.css">
+<meta property="og:title" content="noklam.github.io - Testing Kedro with DuckDB">
+<meta property="og:description" content="Kedro Meet the Duck">
+<meta property="og:site-name" content="noklam.github.io">
+<meta name="twitter:title" content="noklam.github.io - Testing Kedro with DuckDB">
+<meta name="twitter:description" content="Kedro Meet the Duck">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">noklam.github.io</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../blog/index.html">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../archive/index.html">
+ <span class="menu-text">Archive</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/noklam"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Testing Kedro with DuckDB</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../blog/" class="sidebar-item-text sidebar-link">Blog</a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#reference" id="toc-reference" class="nav-link active" data-scroll-target="#reference">Reference</a>
+  <ul>
+  <li><a href="#practical-sql-for-data-analysis" id="toc-practical-sql-for-data-analysis" class="nav-link" data-scroll-target="#practical-sql-for-data-analysis"><strong>Practical SQL for Data Analysis</strong></a>
+  <ul class="collapse">
+  <li><a href="#what-you-can-do-together-with-pandas" id="toc-what-you-can-do-together-with-pandas" class="nav-link" data-scroll-target="#what-you-can-do-together-with-pandas">What you can do <em>together with</em> Pandas</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#appendix-a-there-and-back-again-transferring-data-from-pandas-to-a-sql-engine-and-back" id="toc-appendix-a-there-and-back-again-transferring-data-from-pandas-to-a-sql-engine-and-back" class="nav-link" data-scroll-target="#appendix-a-there-and-back-again-transferring-data-from-pandas-to-a-sql-engine-and-back">Appendix A: There and back again: Transferring data from Pandas to a SQL engine and back</a></li>
+  <li><a href="#appendix-b-pandassql" id="toc-appendix-b-pandassql" class="nav-link" data-scroll-target="#appendix-b-pandassql">Appendix B: PandasSQL</a></li>
+  <li><a href="#appendix-c-directly-querying-parquet-files" id="toc-appendix-c-directly-querying-parquet-files" class="nav-link" data-scroll-target="#appendix-c-directly-querying-parquet-files">Appendix C: Directly querying Parquet files</a></li>
+  <li><a href="#ungrouped-aggregate" id="toc-ungrouped-aggregate" class="nav-link" data-scroll-target="#ungrouped-aggregate">Ungrouped Aggregate</a></li>
+  <li><a href="#grouped-aggregate-with-join-and-filter" id="toc-grouped-aggregate-with-join-and-filter" class="nav-link" data-scroll-target="#grouped-aggregate-with-join-and-filter">Grouped Aggregate with Join and Filter</a></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/noklam/noklam.github.io/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Testing Kedro with DuckDB</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">python</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    Kedro Meet the Duck
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">November 15, 2022</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<p>Exploring DuckDB and how can we use it with <code>kedro</code></p>
+<section id="reference" class="level1">
+<h1>Reference</h1>
+<p>Extend the notebook from: https://colab.research.google.com/drive/1eg_TJpPQr2tyYKWjISJlX8IEAi8Qln3U?usp=sharing</p>
+<section id="practical-sql-for-data-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="practical-sql-for-data-analysis"><strong>Practical SQL for Data Analysis</strong></h2>
+<section id="what-you-can-do-together-with-pandas" class="level3">
+<h3 class="anchored" data-anchor-id="what-you-can-do-together-with-pandas">What you can do <em>together with</em> Pandas</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">--</span>quiet duckdb</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sqlite3</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> duckdb</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Preparation</strong></p>
+<p>Download the data and set up the Pandas data frames. We read the data into a Pandas DataFrame using DuckDB’s built-in Parquet reader.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>wget <span class="op">-</span>q https:<span class="op">//</span>github.com<span class="op">/</span>cwida<span class="op">/</span>duckdb<span class="op">-</span>data<span class="op">/</span>releases<span class="op">/</span>download<span class="op">/</span>v1<span class="fl">.0</span><span class="op">/</span>lineitemsf1.snappy.parquet</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  HTTP/1.1 301 Moved Permanently
+  Server: GitHub.com
+  Date: Tue, 15 Nov 2022 22:34:17 GMT
+  Content-Type: text/html; charset=utf-8
+  Vary: X-PJAX, X-PJAX-Container, Turbo-Visit, Turbo-Frame, Accept-Encoding, Accept, X-Requested-With
+  Location: https://github.com/duckdb/duckdb-data/releases/download/v1.0/lineitemsf1.snappy.parquet
+  Cache-Control: no-cache
+  Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+  X-Frame-Options: deny
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 0
+  Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
+  Content-Security-Policy: default-src 'none'; base-uri 'self'; block-all-mixed-content; child-src github.com/assets-cdn/worker/ gist.github.com/assets-cdn/worker/; connect-src 'self' uploads.github.com objects-origin.githubusercontent.com www.githubstatus.com collector.github.com raw.githubusercontent.com api.github.com github-cloud.s3.amazonaws.com github-production-repository-file-5c1aeb.s3.amazonaws.com github-production-upload-manifest-file-7fdce7.s3.amazonaws.com github-production-user-asset-6210df.s3.amazonaws.com cdn.optimizely.com logx.optimizely.com/v1/events *.actions.githubusercontent.com wss://*.actions.githubusercontent.com online.visualstudio.com/api/v1/locations github-production-repository-image-32fea6.s3.amazonaws.com github-production-release-asset-2e65be.s3.amazonaws.com insights.github.com wss://alive.github.com; font-src github.githubassets.com; form-action 'self' github.com gist.github.com objects-origin.githubusercontent.com; frame-ancestors 'none'; frame-src viewscreen.githubusercontent.com notebooks.githubusercontent.com; img-src 'self' data: github.githubassets.com media.githubusercontent.com camo.githubusercontent.com identicons.github.com avatars.githubusercontent.com github-cloud.s3.amazonaws.com objects.githubusercontent.com objects-origin.githubusercontent.com secured-user-images.githubusercontent.com/ opengraph.githubassets.com github-production-user-asset-6210df.s3.amazonaws.com customer-stories-feed.github.com spotlights-feed.github.com *.githubusercontent.com; manifest-src 'self'; media-src github.com user-images.githubusercontent.com/ secured-user-images.githubusercontent.com/; script-src github.githubassets.com; style-src 'unsafe-inline' github.githubassets.com; worker-src github.com/assets-cdn/worker/ gist.github.com/assets-cdn/worker/
+  Content-Length: 0
+  X-GitHub-Request-Id: D47F:F2DE:2F3E29B:303AC52:637413E9
+  HTTP/1.1 302 Found
+  Server: GitHub.com
+  Date: Tue, 15 Nov 2022 22:34:17 GMT
+  Content-Type: text/html; charset=utf-8
+  Vary: X-PJAX, X-PJAX-Container, Turbo-Visit, Turbo-Frame, Accept-Encoding, Accept, X-Requested-With
+  Location: https://objects.githubusercontent.com/github-production-release-asset-2e65be/263853960/33e88e80-95cb-11ea-8bb7-2dfa0654592c?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20221115%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221115T223417Z&amp;X-Amz-Expires=300&amp;X-Amz-Signature=07d1673053f9e8676510f46b62993e3b9b2428a17f00a613162f67690318e82f&amp;X-Amz-SignedHeaders=host&amp;actor_id=0&amp;key_id=0&amp;repo_id=263853960&amp;response-content-disposition=attachment%3B%20filename%3Dlineitemsf1.snappy.parquet&amp;response-content-type=application%2Foctet-stream
+  Cache-Control: no-cache
+  Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+  X-Frame-Options: deny
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 0
+  Referrer-Policy: no-referrer-when-downgrade
+  Content-Security-Policy: default-src 'none'; base-uri 'self'; block-all-mixed-content; child-src github.com/assets-cdn/worker/ gist.github.com/assets-cdn/worker/; connect-src 'self' uploads.github.com objects-origin.githubusercontent.com www.githubstatus.com collector.github.com raw.githubusercontent.com api.github.com github-cloud.s3.amazonaws.com github-production-repository-file-5c1aeb.s3.amazonaws.com github-production-upload-manifest-file-7fdce7.s3.amazonaws.com github-production-user-asset-6210df.s3.amazonaws.com cdn.optimizely.com logx.optimizely.com/v1/events *.actions.githubusercontent.com wss://*.actions.githubusercontent.com online.visualstudio.com/api/v1/locations github-production-repository-image-32fea6.s3.amazonaws.com github-production-release-asset-2e65be.s3.amazonaws.com insights.github.com wss://alive.github.com; font-src github.githubassets.com; form-action 'self' github.com gist.github.com objects-origin.githubusercontent.com; frame-ancestors 'none'; frame-src viewscreen.githubusercontent.com notebooks.githubusercontent.com; img-src 'self' data: github.githubassets.com media.githubusercontent.com camo.githubusercontent.com identicons.github.com avatars.githubusercontent.com github-cloud.s3.amazonaws.com objects.githubusercontent.com objects-origin.githubusercontent.com secured-user-images.githubusercontent.com/ opengraph.githubassets.com github-production-user-asset-6210df.s3.amazonaws.com customer-stories-feed.github.com spotlights-feed.github.com *.githubusercontent.com; manifest-src 'self'; media-src github.com user-images.githubusercontent.com/ secured-user-images.githubusercontent.com/; script-src github.githubassets.com; style-src 'unsafe-inline' github.githubassets.com; worker-src github.com/assets-cdn/worker/ gist.github.com/assets-cdn/worker/
+  Content-Length: 0
+  X-GitHub-Request-Id: D47F:F2DE:2F3E323:303ACEF:637413E9
+  HTTP/1.1 200 OK
+  Connection: keep-alive
+  Content-Length: 206368635
+  Content-Type: application/octet-stream
+  Last-Modified: Tue, 07 Dec 2021 13:35:44 GMT
+  ETag: "0x8D9B986787C89B4"
+  Server: Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0
+  x-ms-request-id: b588900b-a01e-0060-6d42-f95efa000000
+  x-ms-version: 2020-04-08
+  x-ms-creation-time: Tue, 17 Aug 2021 11:28:44 GMT
+  x-ms-lease-status: unlocked
+  x-ms-lease-state: available
+  x-ms-blob-type: BlockBlob
+  Content-Disposition: attachment; filename=lineitemsf1.snappy.parquet
+  x-ms-server-encrypted: true
+  Fastly-Restarts: 1
+  Accept-Ranges: bytes
+  Age: 0
+  Date: Tue, 15 Nov 2022 22:34:18 GMT
+  Via: 1.1 varnish
+  X-Served-By: cache-lhr7337-LHR
+  X-Cache: MISS
+  X-Cache-Hits: 0
+  X-Timer: S1668551658.108887,VS0,VE259</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>wget <span class="op">-</span>q https:<span class="op">//</span>github.com<span class="op">/</span>cwida<span class="op">/</span>duckdb<span class="op">-</span>data<span class="op">/</span>releases<span class="op">/</span>download<span class="op">/</span>v1<span class="fl">.0</span><span class="op">/</span>orders.parquet</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>time</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>lineitem <span class="op">=</span> duckdb.query(<span class="st">"SELECT * FROM 'lineitemsf1.snappy.parquet'"</span>).to_df()</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>orders <span class="op">=</span> duckdb.query(<span class="st">"SELECT * FROM 'orders.parquet'"</span>).to_df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CPU times: user 7.62 s, sys: 5.43 s, total: 13 s
+Wall time: 14.1 s</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>time</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> pd.read_parquet(<span class="st">"lineitemsf1.snappy.parquet"</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> pd.read_parquet(<span class="st">"orders.parquet"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CPU times: user 6.29 s, sys: 1.5 s, total: 7.78 s
+Wall time: 5.81 s</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>con <span class="op">=</span> duckdb.<span class="ex">connect</span>()</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">'PRAGMA threads=2'</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> timeit(fun, name):</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="im">import</span> time</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    start_time <span class="op">=</span> time.monotonic()</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    fun()</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [name, time.monotonic() <span class="op">-</span> start_time]</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_results(results, title):</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  df <span class="op">=</span> pd.DataFrame.from_dict({</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>      <span class="st">'name'</span>: [x[<span class="dv">0</span>] <span class="cf">for</span> x <span class="kw">in</span> results],</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>      <span class="st">'time'</span>: [x[<span class="dv">1</span>] <span class="cf">for</span> x <span class="kw">in</span> results]</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(title)</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Ungrouped Aggregates</strong></p>
+<p>This performs a simple set of ungrouped aggregates (sum, min, max, avg) over a column without any filters or other complex operations.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>ungrouped_aggregate <span class="op">=</span> <span class="st">'''</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT SUM(l_extendedprice), MIN(l_extendedprice), MAX(l_extendedprice), AVG(l_extendedprice) FROM lineitem</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="st">'''</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> duckdb_ungrouped_aggregate(d_con):</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(d_con.query(ungrouped_aggregate).to_df())</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> duckdb_ungrouped_aggregate_1t():</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    duckdb_ungrouped_aggregate(duckdb)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> duckdb_ungrouped_aggregate_2t():</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    duckdb_ungrouped_aggregate(con)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pandas_ungrouped_aggregate():</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  result <span class="op">=</span> lineitem.groupby(</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'l_returnflag'</span>, <span class="st">'l_linestatus'</span>]</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>  ).agg(</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    Sum<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'sum'</span>),</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    Min<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'min'</span>),</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>    Max<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'max'</span>),</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>    Avg<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'mean'</span>)</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(result)</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># print(lineitem.agg(Sum=('l_extendedprice', 'sum'), Min=('l_extendedprice', 'min'), Max=('l_extendedprice', 'max'), Avg=('l_extendedprice', 'mean')))</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>ua_results <span class="op">=</span> []</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>ua_results.append(timeit(duckdb_ungrouped_aggregate_1t, <span class="st">'DuckDB (1T)'</span>))</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>ua_results.append(timeit(duckdb_ungrouped_aggregate_2t, <span class="st">'DuckDB (2T)'</span>))</span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>ua_results.append(timeit(pandas_ungrouped_aggregate, <span class="st">'Pandas'</span>))</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>plot_results(ua_results, <span class="st">'Ungrouped Aggregate'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   sum(l_extendedprice)  min(l_extendedprice)  max(l_extendedprice)  \
+0          2.295773e+11                 901.0              104949.5   
+
+   avg(l_extendedprice)  
+0          38255.138485  
+   sum(l_extendedprice)  min(l_extendedprice)  max(l_extendedprice)  \
+0          2.295773e+11                 901.0              104949.5   
+
+   avg(l_extendedprice)  
+0          38255.138485  
+                                    Sum    Min       Max           Avg
+l_returnflag l_linestatus                                             
+A            F             5.658655e+10  904.0  104949.5  38273.129735
+N            F             1.487505e+09  920.0  104049.5  38284.467761
+             O             1.149352e+11  901.0  104749.5  38248.015609
+R            F             5.656804e+10  904.0  104899.5  38250.854626
+Ungrouped Aggregate
+          name      time
+0  DuckDB (1T)  0.052544
+1  DuckDB (2T)  0.066239
+2       Pandas  0.801278</code></pre>
+</div>
+</div>
+<p><strong>Grouped Aggregates</strong></p>
+<p>This performs the same set of aggregates, but this time grouped by two other columns (<em>l_returnflag</em> and <em>l_linestatus</em>).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>grouped_aggregate <span class="op">=</span> <span class="st">'''</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT l_returnflag,</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="st">       l_linestatus,</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="st">       SUM(l_extendedprice),</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="st">       MIN(l_extendedprice),</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="st">       MAX(l_extendedprice),</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="st">       AVG(l_extendedprice)</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="st">FROM lineitem</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="st">GROUP BY l_returnflag,</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="st">         l_linestatus</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="st">'''</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> duckdb_grouped_aggregate(d_con):</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(d_con.query(grouped_aggregate).to_df())</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> duckdb_grouped_aggregate_1t():</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    duckdb_grouped_aggregate(duckdb)</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> duckdb_grouped_aggregate_2t():</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    duckdb_grouped_aggregate(con)</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pandas_grouped_aggregate():</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(lineitem.groupby([<span class="st">'l_returnflag'</span>, <span class="st">'l_linestatus'</span>]).agg(Sum<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'sum'</span>), Min<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'min'</span>), Max<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'max'</span>), Avg<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'mean'</span>)))</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> []</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>results.append(timeit(duckdb_grouped_aggregate_1t, <span class="st">'DuckDB (1T)'</span>))</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>results.append(timeit(duckdb_grouped_aggregate_2t, <span class="st">'DuckDB (2T)'</span>))</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>results.append(timeit(pandas_grouped_aggregate, <span class="st">'Pandas'</span>))</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>plot_results(results, <span class="st">'Grouped Aggregate'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  l_returnflag l_linestatus  sum(l_extendedprice)  min(l_extendedprice)  \
+0            N            O          1.149352e+11                 901.0   
+1            R            F          5.656804e+10                 904.0   
+2            A            F          5.658655e+10                 904.0   
+3            N            F          1.487505e+09                 920.0   
+
+   max(l_extendedprice)  avg(l_extendedprice)  
+0              104749.5          38248.015609  
+1              104899.5          38250.854626  
+2              104949.5          38273.129735  
+3              104049.5          38284.467761  
+  l_returnflag l_linestatus  sum(l_extendedprice)  min(l_extendedprice)  \
+0            N            O          1.149352e+11                 901.0   
+1            R            F          5.656804e+10                 904.0   
+2            A            F          5.658655e+10                 904.0   
+3            N            F          1.487505e+09                 920.0   
+
+   max(l_extendedprice)  avg(l_extendedprice)  
+0              104749.5          38248.015609  
+1              104899.5          38250.854626  
+2              104949.5          38273.129735  
+3              104049.5          38284.467761  
+                                    Sum    Min       Max           Avg
+l_returnflag l_linestatus                                             
+A            F             5.658655e+10  904.0  104949.5  38273.129735
+N            F             1.487505e+09  920.0  104049.5  38284.467761
+             O             1.149352e+11  901.0  104749.5  38248.015609
+R            F             5.656804e+10  904.0  104899.5  38250.854626
+Grouped Aggregate
+          name      time
+0  DuckDB (1T)  0.115463
+1  DuckDB (2T)  0.222520
+2       Pandas  0.708696</code></pre>
+</div>
+</div>
+<p><strong>Grouped Aggregate with a Filter</strong></p>
+<p>This benchmark performs a grouped aggregate with a filter over the shipdate column.</p>
+<p>As Pandas does not perform any projection pushdown, we include a version where we manually perform the projection pushdown by filtering only the columns we actually need before running the filter and aggregate.</p>
+<p>This optimization is performed automatically in DuckDB by the query optimizer.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> duckdb_grouped_aggregate_filter(d_con):</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(d_con.query(<span class="st">'''</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT l_returnflag,</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="st">       l_linestatus,</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="st">       SUM(l_extendedprice),</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="st">       MIN(l_extendedprice),</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="st">       MAX(l_extendedprice),</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="st">       AVG(l_extendedprice)</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="st">FROM lineitem</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="st">WHERE</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="st">    l_shipdate &lt;= DATE '1998-09-02'</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="st">GROUP BY l_returnflag,</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="st">         l_linestatus</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="st">'''</span>).to_df())</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> duckdb_grouped_aggregate_filter_1t():</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    duckdb_grouped_aggregate_filter(duckdb)</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> duckdb_grouped_aggregate_filter_2t():</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>    duckdb_grouped_aggregate_filter(con)</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pandas_grouped_aggregate_filter():</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>  filtered_df <span class="op">=</span> lineitem[lineitem[<span class="st">'l_shipdate'</span>] <span class="op">&lt;</span> <span class="st">"1998-09-02"</span>]</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(filtered_df.groupby([<span class="st">'l_returnflag'</span>, <span class="st">'l_linestatus'</span>]).agg(Sum<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'sum'</span>), Min<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'min'</span>), Max<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'max'</span>), Avg<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'mean'</span>)))</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pandas_grouped_aggregate_filter_projection_pushdown():</span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>  pushed_down_df <span class="op">=</span> lineitem[[<span class="st">'l_shipdate'</span>, <span class="st">'l_returnflag'</span>, <span class="st">'l_linestatus'</span>, <span class="st">'l_extendedprice'</span>]]</span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>  filtered_df <span class="op">=</span> pushed_down_df[pushed_down_df[<span class="st">'l_shipdate'</span>] <span class="op">&lt;</span> <span class="st">"1998-09-02"</span>]</span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(filtered_df.groupby([<span class="st">'l_returnflag'</span>, <span class="st">'l_linestatus'</span>]).agg(Sum<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'sum'</span>), Min<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'min'</span>), Max<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'max'</span>), Avg<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'mean'</span>)))</span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> []</span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>results.append(timeit(duckdb_grouped_aggregate_filter_1t, <span class="st">'DuckDB (1T)'</span>))</span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>results.append(timeit(duckdb_grouped_aggregate_filter_2t, <span class="st">'DuckDB (2T)'</span>))</span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>results.append(timeit(pandas_grouped_aggregate_filter, <span class="st">'Pandas'</span>))</span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>results.append(timeit(pandas_grouped_aggregate_filter_projection_pushdown, <span class="st">'Pandas (manual pushdown)'</span>))</span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a>plot_results(results, <span class="st">'Grouped Aggregate + Filter'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  l_returnflag l_linestatus  sum(l_extendedprice)  min(l_extendedprice)  \
+0            N            O          1.117017e+11                 901.0   
+1            A            F          5.658655e+10                 904.0   
+2            R            F          5.656804e+10                 904.0   
+3            N            F          1.487505e+09                 920.0   
+
+   max(l_extendedprice)  avg(l_extendedprice)  
+0              104749.5          38249.117989  
+1              104949.5          38273.129735  
+2              104899.5          38250.854626  
+3              104049.5          38284.467761  
+  l_returnflag l_linestatus  sum(l_extendedprice)  min(l_extendedprice)  \
+0            N            O          1.117017e+11                 901.0   
+1            A            F          5.658655e+10                 904.0   
+2            R            F          5.656804e+10                 904.0   
+3            N            F          1.487505e+09                 920.0   
+
+   max(l_extendedprice)  avg(l_extendedprice)  
+0              104749.5          38249.117989  
+1              104949.5          38273.129735  
+2              104899.5          38250.854626  
+3              104049.5          38284.467761  
+                                    Sum    Min       Max           Avg
+l_returnflag l_linestatus                                             
+A            F             5.658655e+10  904.0  104949.5  38273.129735
+N            F             1.487505e+09  920.0  104049.5  38284.467761
+             O             1.116318e+11  901.0  104749.5  38249.322811
+R            F             5.656804e+10  904.0  104899.5  38250.854626
+                                    Sum    Min       Max           Avg
+l_returnflag l_linestatus                                             
+A            F             5.658655e+10  904.0  104949.5  38273.129735
+N            F             1.487505e+09  920.0  104049.5  38284.467761
+             O             1.116318e+11  901.0  104749.5  38249.322811
+R            F             5.656804e+10  904.0  104899.5  38250.854626
+Grouped Aggregate + Filter
+                       name      time
+0               DuckDB (1T)  0.281653
+1               DuckDB (2T)  0.356302
+2                    Pandas  2.889015
+3  Pandas (manual pushdown)  1.625353</code></pre>
+</div>
+</div>
+<p><strong>Grouped Aggregate with Join and Filter</strong></p>
+<p>In this benchmark we expand on the previous benchmark by including a join and a filter on the joined-on table.</p>
+<p>Note that the naive version in Pandas is extremely slow, as it performs a full join of the entire table including all the columns that are not used and all the rows that will be filtered out. For that reason we have included a separate benchmark in which we have manually optimized the Pandas code by pushing down the projections and the filters.</p>
+<p>These optimizations are performed automatically in DuckDB by the query optimizer.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co"># projection &amp; filter on lineitem table</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>lineitem_projected <span class="op">=</span> lineitem[</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  [<span class="st">'l_shipdate'</span>,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>   <span class="st">'l_orderkey'</span>,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>   <span class="st">'l_linestatus'</span>,</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>   <span class="st">'l_returnflag'</span>,</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>   <span class="st">'l_extendedprice'</span>]</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>lineitem_filtered <span class="op">=</span> lineitem_projected[</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  lineitem_projected[<span class="st">'l_shipdate'</span>] <span class="op">&lt;</span> <span class="st">"1998-09-02"</span>]</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="co"># projection and filter on order table</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>orders_projected <span class="op">=</span> orders[</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  [<span class="st">'o_orderkey'</span>,</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>   <span class="st">'o_orderstatus'</span>]</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>orders_filtered <span class="op">=</span> orders_projected[</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>  orders_projected[<span class="st">'o_orderstatus'</span>] <span class="op">==</span> <span class="st">'O'</span>]</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="co"># perform the join</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>merged <span class="op">=</span> lineitem_filtered.merge(</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>  orders_filtered,</span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>  left_on<span class="op">=</span><span class="st">'l_orderkey'</span>,</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>  right_on<span class="op">=</span><span class="st">'o_orderkey'</span>)</span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a><span class="co"># perform the aggregate</span></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> merged.groupby(</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>  [<span class="st">'l_returnflag'</span>, <span class="st">'l_linestatus'</span>]</span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>).agg(</span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>  Sum<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'sum'</span>),</span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>  Min<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'min'</span>),</span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>  Max<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'max'</span>),</span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>  Avg<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'mean'</span>)</span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>result</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th></th>
+      <th>Sum</th>
+      <th>Min</th>
+      <th>Max</th>
+      <th>Avg</th>
+    </tr>
+    <tr>
+      <th>l_returnflag</th>
+      <th>l_linestatus</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>N</th>
+      <th>O</th>
+      <td>1.080448e+11</td>
+      <td>901.0</td>
+      <td>104749.5</td>
+      <td>38250.662806</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> duckdb_grouped_aggregate_filter_join(d_con):</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(d_con.query(<span class="st">'''</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT l_returnflag,</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="st">       l_linestatus,</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="st">       sum(l_extendedprice),</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="st">       min(l_extendedprice),</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="st">       max(l_extendedprice),</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="st">       avg(l_extendedprice)</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="st">FROM lineitem lineitem</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="st">JOIN orders orders ON (l_orderkey=o_orderkey)</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="st">WHERE l_shipdate &lt;= DATE '1998-09-02'</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="st">  AND o_orderstatus='O'</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="st">GROUP BY l_returnflag,</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="st">         l_linestatus</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="st">'''</span>).to_df())</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> duckdb_grouped_aggregate_filter_join_1t():</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>    duckdb_grouped_aggregate_filter_join(duckdb)</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> duckdb_grouped_aggregate_filter_join_2t():</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>    duckdb_grouped_aggregate_filter_join(con)</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pandas_grouped_aggregate_filter_join():</span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>    merged <span class="op">=</span> lineitem.merge(orders, left_on<span class="op">=</span><span class="st">'l_orderkey'</span>, right_on<span class="op">=</span><span class="st">'o_orderkey'</span>)</span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>    filtered_a <span class="op">=</span> merged[merged[<span class="st">'l_shipdate'</span>] <span class="op">&lt;</span> <span class="st">"1998-09-02"</span>]</span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>    filtered_b <span class="op">=</span> filtered_a[filtered_a[<span class="st">'o_orderstatus'</span>] <span class="op">==</span> <span class="st">'O'</span>]</span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> filtered_b.groupby([<span class="st">'l_returnflag'</span>, <span class="st">'l_linestatus'</span>]).agg(Sum<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'sum'</span>), Min<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'min'</span>), Max<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'max'</span>), Avg<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'mean'</span>))</span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(result)</span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pandas_grouped_aggregate_filter_join_manual_pushdown():</span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a>    lineitem_projected <span class="op">=</span> lineitem[[<span class="st">'l_shipdate'</span>, <span class="st">'l_orderkey'</span>, <span class="st">'l_linestatus'</span>, <span class="st">'l_returnflag'</span>, <span class="st">'l_extendedprice'</span>]]</span>
+<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a>    lineitem_filtered <span class="op">=</span> lineitem_projected[lineitem_projected[<span class="st">'l_shipdate'</span>] <span class="op">&lt;</span> <span class="st">"1998-09-02"</span>]</span>
+<span id="cb19-33"><a href="#cb19-33" aria-hidden="true" tabindex="-1"></a>    orders_projected <span class="op">=</span> orders[[<span class="st">'o_orderkey'</span>, <span class="st">'o_orderstatus'</span>]]</span>
+<span id="cb19-34"><a href="#cb19-34" aria-hidden="true" tabindex="-1"></a>    orders_filtered <span class="op">=</span> orders_projected[orders_projected[<span class="st">'o_orderstatus'</span>] <span class="op">==</span> <span class="st">'O'</span>]</span>
+<span id="cb19-35"><a href="#cb19-35" aria-hidden="true" tabindex="-1"></a>    merged <span class="op">=</span> lineitem_filtered.merge(orders_filtered, left_on<span class="op">=</span><span class="st">'l_orderkey'</span>, right_on<span class="op">=</span><span class="st">'o_orderkey'</span>)</span>
+<span id="cb19-36"><a href="#cb19-36" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> merged.groupby([<span class="st">'l_returnflag'</span>, <span class="st">'l_linestatus'</span>]).agg(Sum<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'sum'</span>), Min<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'min'</span>), Max<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'max'</span>), Avg<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'mean'</span>))</span>
+<span id="cb19-37"><a href="#cb19-37" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(result)</span>
+<span id="cb19-38"><a href="#cb19-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-39"><a href="#cb19-39" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> []</span>
+<span id="cb19-40"><a href="#cb19-40" aria-hidden="true" tabindex="-1"></a>results.append(timeit(duckdb_grouped_aggregate_filter_join_1t, <span class="st">'DuckDB (1T)'</span>))</span>
+<span id="cb19-41"><a href="#cb19-41" aria-hidden="true" tabindex="-1"></a>results.append(timeit(duckdb_grouped_aggregate_filter_join_2t, <span class="st">'DuckDB (2T)'</span>))</span>
+<span id="cb19-42"><a href="#cb19-42" aria-hidden="true" tabindex="-1"></a>results.append(timeit(pandas_grouped_aggregate_filter_join, <span class="st">'Pandas'</span>))</span>
+<span id="cb19-43"><a href="#cb19-43" aria-hidden="true" tabindex="-1"></a>results.append(timeit(pandas_grouped_aggregate_filter_join_manual_pushdown, <span class="st">'Pandas (manual pushdown)'</span>))</span>
+<span id="cb19-44"><a href="#cb19-44" aria-hidden="true" tabindex="-1"></a>plot_results(results, <span class="st">'Grouped Aggregate Join'</span>)</span>
+<span id="cb19-45"><a href="#cb19-45" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  l_returnflag l_linestatus  sum(l_extendedprice)  min(l_extendedprice)  \
+0            N            O          1.081147e+11                 901.0   
+
+   max(l_extendedprice)  avg(l_extendedprice)  
+0              104749.5          38250.450307  
+  l_returnflag l_linestatus  sum(l_extendedprice)  min(l_extendedprice)  \
+0            N            O          1.081147e+11                 901.0   
+
+   max(l_extendedprice)  avg(l_extendedprice)  
+0              104749.5          38250.450307  
+                                    Sum    Min       Max           Avg
+l_returnflag l_linestatus                                             
+N            O             1.080448e+11  901.0  104749.5  38250.662806
+                                    Sum    Min       Max           Avg
+l_returnflag l_linestatus                                             
+N            O             1.080448e+11  901.0  104749.5  38250.662806
+Grouped Aggregate Join
+                       name       time
+0               DuckDB (1T)   0.218088
+1               DuckDB (2T)   0.376592
+2                    Pandas  11.403579
+3  Pandas (manual pushdown)   2.765103</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="appendix-a-there-and-back-again-transferring-data-from-pandas-to-a-sql-engine-and-back" class="level1">
+<h1>Appendix A: There and back again: Transferring data from Pandas to a SQL engine and back</h1>
+<p>As Appendix A relies on the presence of an external PostgreSQL database server, the code cannot be executed in colab. The source code can be found here: https://gist.github.com/hannesmuehleisen/a95a39a1eda63aeb0ca13fd82d1ba49c</p>
+</section>
+<section id="appendix-b-pandassql" class="level1">
+<h1>Appendix B: PandasSQL</h1>
+<p>Note: we cannot run this on the original dataset, as colab will run out of memory and crash. Instead for the benchmark we add a sample clause to reduce the data set size to 10% of the original data set size.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">--</span>quiet pandasql</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandasql <span class="im">as</span> psql</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>pysqldf <span class="op">=</span> <span class="kw">lambda</span> q: psql.sqldf(q, <span class="bu">globals</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>lineitem_sample <span class="op">=</span> duckdb.query(<span class="st">"SELECT * FROM 'lineitemsf1.snappy.parquet' USING SAMPLE 10%"</span>).to_df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>ungrouped_aggregate <span class="op">=</span> <span class="st">'''</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT SUM(l_extendedprice), MIN(l_extendedprice), MAX(l_extendedprice), AVG(l_extendedprice) FROM lineitem_sample</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="st">'''</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> duckdb_ungrouped_aggregate(d_con):</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(d_con.query(ungrouped_aggregate).to_df())</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> duckdb_ungrouped_aggregate_1t():</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    duckdb_ungrouped_aggregate(duckdb)</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> duckdb_ungrouped_aggregate_2t():</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    duckdb_ungrouped_aggregate(con)</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pandas_ungrouped_aggregate():</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(lineitem_sample.agg(Sum<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'sum'</span>), Min<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'min'</span>), Max<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'max'</span>), Avg<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'mean'</span>)))</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ungrouped_aggregate_pandasql():</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(pysqldf(ungrouped_aggregate))</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>ua_results <span class="op">=</span> []</span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>ua_results.append(timeit(duckdb_ungrouped_aggregate_1t, <span class="st">'DuckDB (1T)'</span>))</span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>ua_results.append(timeit(duckdb_ungrouped_aggregate_2t, <span class="st">'DuckDB (2T)'</span>))</span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>ua_results.append(timeit(pandas_ungrouped_aggregate, <span class="st">'Pandas'</span>))</span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>ua_results.append(timeit(ungrouped_aggregate_pandasql, <span class="st">'PandaSQL'</span>))</span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>plot_results(ua_results, <span class="st">'Ungrouped Aggregate'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   sum(l_extendedprice)  min(l_extendedprice)  max(l_extendedprice)  \
+0          2.318151e+10                 907.0              104899.5   
+
+   avg(l_extendedprice)  
+0          38240.198955  
+   sum(l_extendedprice)  min(l_extendedprice)  max(l_extendedprice)  \
+0          2.318151e+10                 907.0              104899.5   
+
+   avg(l_extendedprice)  
+0          38240.198955  
+     l_extendedprice
+Sum     2.318151e+10
+Min     9.070000e+02
+Max     1.048995e+05
+Avg     3.824020e+04
+   SUM(l_extendedprice)  MIN(l_extendedprice)  MAX(l_extendedprice)  \
+0          2.318151e+10                 907.0              104899.5   
+
+   AVG(l_extendedprice)  
+0          38240.198955  
+Ungrouped Aggregate
+          name      time
+0  DuckDB (1T)  0.039731
+1  DuckDB (2T)  0.033024
+2       Pandas  0.012675
+3     PandaSQL  9.181672</code></pre>
+</div>
+</div>
+</section>
+<section id="appendix-c-directly-querying-parquet-files" class="level1">
+<h1>Appendix C: Directly querying Parquet files</h1>
+<p>In the benchmarks above, we fully read the parquet files into Pandas. However, DuckDB also has the capability of directly running queries on top of Parquet files. In this appendix, we show the performance of this compared to loading the file into Python first.</p>
+<p>You can even use the wildcard syntax to run queries on multiple Parquet files in the same folder and create a unified single-table view over them (as long as they have the same schema).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># need to install pyarrow for pandas parquet reading</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install pyarrow</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Requirement already satisfied: pyarrow in /Users/Nok_Lam_Chan/miniconda3/envs/duckdb/lib/python3.9/site-packages (10.0.0)
+Requirement already satisfied: numpy&gt;=1.16.6 in /Users/Nok_Lam_Chan/miniconda3/envs/duckdb/lib/python3.9/site-packages (from pyarrow) (1.23.4)</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># set up the view</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>parquet_con <span class="op">=</span> duckdb.<span class="ex">connect</span>()</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>parquet_con.execute(<span class="st">"CREATE VIEW lineitem_parquet AS SELECT * FROM 'lineitemsf1.snappy.parquet'"</span>)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>parquet_con.execute(<span class="st">"CREATE VIEW orders_parquet AS SELECT * FROM 'orders.parquet'"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>&lt;duckdb.DuckDBPyConnection&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="ungrouped-aggregate" class="level1">
+<h1>Ungrouped Aggregate</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>ungrouped_aggregate <span class="op">=</span> <span class="st">'''</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT SUM(l_extendedprice), MIN(l_extendedprice), MAX(l_extendedprice), AVG(l_extendedprice) FROM lineitem_parquet</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="st">'''</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> duckdb_parquet_query(d_con):</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(d_con.query(ungrouped_aggregate).to_df())</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> duckdb_ungrouped_parquet_1t():</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  parquet_con.execute(<span class="st">'PRAGMA threads=1'</span>)</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  duckdb_ungrouped_aggregate(parquet_con)</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> duckdb_ungrouped_parquet_2t():</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>  parquet_con.execute(<span class="st">'PRAGMA threads=2'</span>)</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>  duckdb_ungrouped_aggregate(parquet_con)</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pandas_ungrouped_aggregate():</span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(lineitem.agg(Sum<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'sum'</span>), Min<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'min'</span>), Max<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'max'</span>), Avg<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'mean'</span>)))</span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pandas_ungrouped_aggregate_parquet_load():</span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>  lineitem_pandas_parquet <span class="op">=</span> pd.read_parquet(<span class="st">'lineitemsf1.snappy.parquet'</span>)</span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(lineitem_pandas_parquet.agg(Sum<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'sum'</span>), Min<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'min'</span>), Max<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'max'</span>), Avg<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'mean'</span>)))</span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pandas_ungrouped_aggregate_parquet_load_pushdown():</span>
+<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a>  lineitem_pandas_parquet <span class="op">=</span> pd.read_parquet(<span class="st">'lineitemsf1.snappy.parquet'</span>, columns<span class="op">=</span>[<span class="st">'l_extendedprice'</span>])</span>
+<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(lineitem_pandas_parquet.agg(Sum<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'sum'</span>), Min<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'min'</span>), Max<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'max'</span>), Avg<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'mean'</span>)))</span>
+<span id="cb30-26"><a href="#cb30-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-27"><a href="#cb30-27" aria-hidden="true" tabindex="-1"></a>ua_results <span class="op">=</span> []</span>
+<span id="cb30-28"><a href="#cb30-28" aria-hidden="true" tabindex="-1"></a>ua_results.append(timeit(duckdb_ungrouped_parquet_1t, <span class="st">'DuckDB (1 Thread)'</span>))</span>
+<span id="cb30-29"><a href="#cb30-29" aria-hidden="true" tabindex="-1"></a>ua_results.append(timeit(duckdb_ungrouped_parquet_2t, <span class="st">'DuckDB (2 Threads)'</span>))</span>
+<span id="cb30-30"><a href="#cb30-30" aria-hidden="true" tabindex="-1"></a>ua_results.append(timeit(pandas_ungrouped_aggregate, <span class="st">'Pandas'</span>))</span>
+<span id="cb30-31"><a href="#cb30-31" aria-hidden="true" tabindex="-1"></a>ua_results.append(timeit(pandas_ungrouped_aggregate_parquet_load, <span class="st">'Pandas + Parquet Load'</span>))</span>
+<span id="cb30-32"><a href="#cb30-32" aria-hidden="true" tabindex="-1"></a>ua_results.append(timeit(pandas_ungrouped_aggregate_parquet_load_pushdown, <span class="st">'Pandas + Parquet Load (Pushdown)'</span>))</span>
+<span id="cb30-33"><a href="#cb30-33" aria-hidden="true" tabindex="-1"></a>plot_results(ua_results, <span class="st">'Ungrouped Aggregate (Parquet)'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   sum(l_extendedprice)  min(l_extendedprice)  max(l_extendedprice)  \
+0          2.295773e+11                 901.0              104949.5   
+
+   avg(l_extendedprice)  
+0          38255.138485  
+   sum(l_extendedprice)  min(l_extendedprice)  max(l_extendedprice)  \
+0          2.295773e+11                 901.0              104949.5   
+
+   avg(l_extendedprice)  
+0          38255.138485  
+     l_extendedprice
+Sum     2.295773e+11
+Min     9.010000e+02
+Max     1.049495e+05
+Avg     3.825514e+04
+     l_extendedprice
+Sum     2.295773e+11
+Min     9.010000e+02
+Max     1.049495e+05
+Avg     3.825514e+04
+     l_extendedprice
+Sum     2.295773e+11
+Min     9.010000e+02
+Max     1.049495e+05
+Avg     3.825514e+04
+Ungrouped Aggregate (Parquet)
+                               name      time
+0                 DuckDB (1 Thread)  0.173902
+1                DuckDB (2 Threads)  0.086305
+2                            Pandas  0.050655
+3             Pandas + Parquet Load  6.311870
+4  Pandas + Parquet Load (Pushdown)  0.151299</code></pre>
+</div>
+</div>
+</section>
+<section id="grouped-aggregate-with-join-and-filter" class="level1">
+<h1>Grouped Aggregate with Join and Filter</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> duckdb_grouped_aggregate_filter_join_pq(d_con):</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(d_con.query(<span class="st">'''</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT l_returnflag,</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="st">       l_linestatus,</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="st">       sum(l_extendedprice),</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="st">       min(l_extendedprice),</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="st">       max(l_extendedprice),</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="st">       avg(l_extendedprice)</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="st">FROM lineitem_parquet lineitem</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="st">JOIN orders_parquet orders ON (l_orderkey=o_orderkey)</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a><span class="st">WHERE l_shipdate &lt;= DATE '1998-09-02'</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a><span class="st">  AND o_orderstatus='O'</span></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a><span class="st">GROUP BY l_returnflag,</span></span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a><span class="st">         l_linestatus</span></span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a><span class="st">'''</span>).to_df())</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> duckdb_grouped_aggregate_filter_join_pq_1t():</span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>  parquet_con.execute(<span class="st">'PRAGMA threads=1'</span>)</span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>  duckdb_grouped_aggregate_filter_join_pq(parquet_con)</span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> duckdb_grouped_aggregate_filter_join_pq_2t():</span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>  parquet_con.execute(<span class="st">'PRAGMA threads=2'</span>)</span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>  duckdb_grouped_aggregate_filter_join_pq(parquet_con)</span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pandas_grouped_aggregate_filter_join_pq():</span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a>  lineitem_pandas_parquet <span class="op">=</span> pd.read_parquet(<span class="st">'lineitemsf1.snappy.parquet'</span>)</span>
+<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a>  orders_pandas_parquet <span class="op">=</span> pd.read_parquet(<span class="st">'orders.parquet'</span>)</span>
+<span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a>  merged <span class="op">=</span> lineitem_pandas_parquet.merge(orders, left_on<span class="op">=</span><span class="st">'l_orderkey'</span>, right_on<span class="op">=</span><span class="st">'o_orderkey'</span>)</span>
+<span id="cb32-29"><a href="#cb32-29" aria-hidden="true" tabindex="-1"></a>  filtered_a <span class="op">=</span> merged[merged[<span class="st">'l_shipdate'</span>] <span class="op">&lt;</span> <span class="st">"1998-09-02"</span>]</span>
+<span id="cb32-30"><a href="#cb32-30" aria-hidden="true" tabindex="-1"></a>  filtered_b <span class="op">=</span> filtered_a[filtered_a[<span class="st">'o_orderstatus'</span>] <span class="op">==</span> <span class="st">'O'</span>]</span>
+<span id="cb32-31"><a href="#cb32-31" aria-hidden="true" tabindex="-1"></a>  result <span class="op">=</span> filtered_b.groupby([<span class="st">'l_returnflag'</span>, <span class="st">'l_linestatus'</span>]).agg(Sum<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'sum'</span>), Min<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'min'</span>), Max<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'max'</span>), Avg<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'mean'</span>))</span>
+<span id="cb32-32"><a href="#cb32-32" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(result)</span>
+<span id="cb32-33"><a href="#cb32-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-34"><a href="#cb32-34" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pandas_grouped_aggregate_filter_join_manual_pushdown_pq():</span>
+<span id="cb32-35"><a href="#cb32-35" aria-hidden="true" tabindex="-1"></a>  lineitem_projected <span class="op">=</span> pd.read_parquet(<span class="st">'lineitemsf1.snappy.parquet'</span>, columns<span class="op">=</span>[<span class="st">'l_shipdate'</span>, <span class="st">'l_orderkey'</span>, <span class="st">'l_linestatus'</span>, <span class="st">'l_returnflag'</span>, <span class="st">'l_extendedprice'</span>])</span>
+<span id="cb32-36"><a href="#cb32-36" aria-hidden="true" tabindex="-1"></a>  orders_projected <span class="op">=</span> pd.read_parquet(<span class="st">'orders.parquet'</span>, columns<span class="op">=</span>[<span class="st">'o_orderkey'</span>, <span class="st">'o_orderstatus'</span>])</span>
+<span id="cb32-37"><a href="#cb32-37" aria-hidden="true" tabindex="-1"></a>  lineitem_filtered <span class="op">=</span> lineitem_projected[lineitem_projected[<span class="st">'l_shipdate'</span>] <span class="op">&lt;</span> <span class="st">"1998-09-02"</span>]</span>
+<span id="cb32-38"><a href="#cb32-38" aria-hidden="true" tabindex="-1"></a>  orders_filtered <span class="op">=</span> orders_projected[orders_projected[<span class="st">'o_orderstatus'</span>] <span class="op">==</span> <span class="st">'O'</span>]</span>
+<span id="cb32-39"><a href="#cb32-39" aria-hidden="true" tabindex="-1"></a>  merged <span class="op">=</span> lineitem_filtered.merge(orders_filtered, left_on<span class="op">=</span><span class="st">'l_orderkey'</span>, right_on<span class="op">=</span><span class="st">'o_orderkey'</span>)</span>
+<span id="cb32-40"><a href="#cb32-40" aria-hidden="true" tabindex="-1"></a>  result <span class="op">=</span> merged.groupby([<span class="st">'l_returnflag'</span>, <span class="st">'l_linestatus'</span>]).agg(Sum<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'sum'</span>), Min<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'min'</span>), Max<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'max'</span>), Avg<span class="op">=</span>(<span class="st">'l_extendedprice'</span>, <span class="st">'mean'</span>))</span>
+<span id="cb32-41"><a href="#cb32-41" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(result)</span>
+<span id="cb32-42"><a href="#cb32-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-43"><a href="#cb32-43" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> []</span>
+<span id="cb32-44"><a href="#cb32-44" aria-hidden="true" tabindex="-1"></a>results.append(timeit(duckdb_grouped_aggregate_filter_join_pq_1t, <span class="st">'DuckDB (1T)'</span>))</span>
+<span id="cb32-45"><a href="#cb32-45" aria-hidden="true" tabindex="-1"></a>results.append(timeit(duckdb_grouped_aggregate_filter_join_pq_2t, <span class="st">'DuckDB (2T)'</span>))</span>
+<span id="cb32-46"><a href="#cb32-46" aria-hidden="true" tabindex="-1"></a>results.append(timeit(pandas_grouped_aggregate_filter_join_pq, <span class="st">'Pandas'</span>))</span>
+<span id="cb32-47"><a href="#cb32-47" aria-hidden="true" tabindex="-1"></a>results.append(timeit(pandas_grouped_aggregate_filter_join_manual_pushdown_pq, <span class="st">'Pandas (manual pushdown)'</span>))</span>
+<span id="cb32-48"><a href="#cb32-48" aria-hidden="true" tabindex="-1"></a>plot_results(results, <span class="st">'Grouped Aggregate Join (Parquet)'</span>)</span>
+<span id="cb32-49"><a href="#cb32-49" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  l_returnflag l_linestatus  sum(l_extendedprice)  min(l_extendedprice)  \
+0            N            O          1.081147e+11                 901.0   
+
+   max(l_extendedprice)  avg(l_extendedprice)  
+0              104749.5          38250.450307  
+  l_returnflag l_linestatus  sum(l_extendedprice)  min(l_extendedprice)  \
+0            N            O          1.081147e+11                 901.0   
+
+   max(l_extendedprice)  avg(l_extendedprice)  
+0              104749.5          38250.450307  
+                                    Sum    Min       Max           Avg
+l_returnflag l_linestatus                                             
+N            O             1.080448e+11  901.0  104749.5  38250.662806
+                                    Sum    Min       Max           Avg
+l_returnflag l_linestatus                                             
+N            O             1.080448e+11  901.0  104749.5  38250.662806
+Grouped Aggregate Join (Parquet)
+                       name       time
+0               DuckDB (1T)   0.828549
+1               DuckDB (2T)   0.508537
+2                    Pandas  13.954761
+3  Pandas (manual pushdown)   2.337109</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Part II - Transform Pandas to DuckDB Query</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Part III - Create the DuckDB DataSet</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Part IV - Create the DuckDB Transformer</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
