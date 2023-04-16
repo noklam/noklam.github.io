@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.475">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>noklam - Archive</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-listing/list.min.js"></script>
+<script src="../site_libs/quarto-listing/quarto-listing.js"></script>
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script>
+
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    const listingTargetEl = window.document.querySelector('#listing-listing .list');
+    if (!listingTargetEl) {
+      // No listing discovered, do not attach.
+      return; 
+    }
+
+    const options = {
+      valueNames: ['listing-date','listing-title','listing-author','listing-subtitle','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      
+      searchColumns: ["listing-date","listing-title","listing-author","listing-subtitle","listing-image","listing-description","listing-categories"],
+    };
+
+    window['quarto-listings'] = window['quarto-listings'] || {};
+    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
+
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  });
+
+  window.addEventListener('hashchange',() => {
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  })
+  </script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-83544344-5', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="../styles.css">
+<link rel="alternate" type="application/rss+xml" title="noklam" href="index.xml"><meta property="og:title" content="noklam - Archive">
+<meta property="og:description" content="Anything blog about Python">
+<meta property="og:site-name" content="noklam">
+<meta name="twitter:title" content="noklam - Archive">
+<meta name="twitter:description" content="Anything blog about Python">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">noklam</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../blog/index.html">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../archive/index.html" aria-current="page">
+ <span class="menu-text">Archive</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/noklam"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Archive</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../blog/" class="sidebar-item-text sidebar-link">Blog</a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(19)</span></div><div class="category" data-category="azure">azure <span class="quarto-category-count">(1)</span></div><div class="category" data-category="cli">cli <span class="quarto-category-count">(1)</span></div><div class="category" data-category="design pattern">design pattern <span class="quarto-category-count">(1)</span></div><div class="category" data-category="fastai">fastai <span class="quarto-category-count">(1)</span></div><div class="category" data-category="fsdl">fsdl <span class="quarto-category-count">(2)</span></div><div class="category" data-category="kaggle">kaggle <span class="quarto-category-count">(1)</span></div><div class="category" data-category="product">product <span class="quarto-category-count">(1)</span></div><div class="category" data-category="python">python <span class="quarto-category-count">(10)</span></div><div class="category" data-category="python-internal">python-internal <span class="quarto-category-count">(1)</span></div><div class="category" data-category="software">software <span class="quarto-category-count">(1)</span></div><div class="category" data-category="typer">typer <span class="quarto-category-count">(1)</span></div></div></div>
+<!-- main -->
+<main class="content column-body" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Archive</h1>
+<p class="subtitle lead">Anything blog about Python</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+
+
+
+
+<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
+<div class="list quarto-listing-default">
+<div class="quarto-post image-right" data-index="0" data-listing-file-modified-sort="1681605466051" data-listing-reading-time-sort="8.38">
+<div class="thumbnail">
+<p><a href="../archive/posts/2022-07-11-europython2022-summary.html"> <img src="../archive/posts/images/europython_welcome.jpg" class="thumnail-image"> </a></p>
+</div>
+<div class="body">
+<a href="../archive/posts/2022-07-11-europython2022-summary.html">
+<h3 class="no-anchor listing-title">
+EuroPython 2022 - Conference Notes &amp; Summary
+</h3>
+<div class="listing-subtitle">
+
+</div>
+<div class="listing-description">
+<p><strong>new</strong> is the first step of instance creation. It’s called first,</p>
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="../archive/posts/2022-07-11-europython2022-summary.html"> </a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="1" data-listing-file-modified-sort="1681605423307" data-listing-reading-time-sort="0.005">
+<div class="thumbnail">
+<a href="../archive/posts/index.html">
+<div class="thumbnail-image">
+
+</div>
+</a><p><a href="../archive/posts/index.html"></a></p>
+</div>
+<div class="body">
+<a href="../archive/posts/index.html">
+<h3 class="no-anchor listing-title">
+Blog
+</h3>
+<div class="listing-subtitle">
+Anything blog about Python
+</div>
+<div class="listing-description">
+
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="../archive/posts/index.html"> </a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="2" data-listing-file-modified-sort="1681605466075" data-listing-reading-time-sort="1.96">
+<div class="thumbnail">
+<a href="../archive/posts/2022-11-08-kedro-debugging.html">
+<div class="thumbnail-image">
+
+</div>
+</a><p><a href="../archive/posts/2022-11-08-kedro-debugging.html"></a></p>
+</div>
+<div class="body">
+<a href="../archive/posts/2022-11-08-kedro-debugging.html">
+<h3 class="no-anchor listing-title">
+Demo of debugging Kedro pipeline with noetebook
+</h3>
+<div class="listing-subtitle">
+
+</div>
+<div class="listing-description">
+Read from stack trace - find out the line of code that produce the error
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="../archive/posts/2022-11-08-kedro-debugging.html"> </a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="3" data-listing-file-modified-sort="1681605466171" data-listing-reading-time-sort="1.675">
+<div class="thumbnail">
+<a href="../archive/posts/2022-05-30-mocking-with-pytest-patch.html">
+<div class="thumbnail-image">
+
+</div>
+</a><p><a href="../archive/posts/2022-05-30-mocking-with-pytest-patch.html"></a></p>
+</div>
+<div class="body">
+<a href="../archive/posts/2022-05-30-mocking-with-pytest-patch.html">
+<h3 class="no-anchor listing-title">
+Testing with Mocking
+</h3>
+<div class="listing-subtitle">
+
+</div>
+<div class="listing-description">
+One of the mainstream mocking library is the standard one from <code>unittest</code>, there are also pytest plugin <code>pytest-mock</code> which wraps on <code>unittest</code>.
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="../archive/posts/2022-05-30-mocking-with-pytest-patch.html"> </a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="4" data-categories="python" data-listing-date-sort="1644451200000" data-listing-file-modified-sort="1681605423307" data-listing-reading-time-sort="0.065">
+<div class="thumbnail">
+<a href="../archive/posts/2022-02-10-journey-of-understanding-python-and-programming-langauge.html">
+<div class="thumbnail-image">
+
+</div>
+</a><p><a href="../archive/posts/2022-02-10-journey-of-understanding-python-and-programming-langauge.html"></a></p>
+</div>
+<div class="body">
+<a href="../archive/posts/2022-02-10-journey-of-understanding-python-and-programming-langauge.html">
+<h3 class="no-anchor listing-title">
+Journey of understanding Python and programming language
+</h3>
+<div class="listing-subtitle">
+
+</div>
+</a>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('python'); return false;">
+python
+</div>
+</div>
+<a href="../archive/posts/2022-02-10-journey-of-understanding-python-and-programming-langauge.html">
+<div class="listing-description">
+<p>Some unfinished notes about Python lower level details.</p>
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="../archive/posts/2022-02-10-journey-of-understanding-python-and-programming-langauge.html">
+<div class="listing-date">
+Feb 10, 2022
+</div>
+<div class="listing-author">
+noklam
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="5" data-categories="product" data-listing-date-sort="1637193600000" data-listing-file-modified-sort="1681605423307" data-listing-reading-time-sort="4.265">
+<div class="thumbnail">
+<p><a href="../archive/posts/2021-11-18-what-can-we-learn-from-shipping-crisis-as-a-data-scientist.html"> <img src="../archive/posts/images/2021-11-18-23-37-38.png" class="thumnail-image"> </a></p>
+</div>
+<div class="body">
+<a href="../archive/posts/2021-11-18-what-can-we-learn-from-shipping-crisis-as-a-data-scientist.html">
+<h3 class="no-anchor listing-title">
+What can we learn from Shipping Crisis as a Data Scientist?
+</h3>
+<div class="listing-subtitle">
+
+</div>
+</a>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('product'); return false;">
+product
+</div>
+</div>
+<a href="../archive/posts/2021-11-18-what-can-we-learn-from-shipping-crisis-as-a-data-scientist.html">
+<div class="listing-description">
+<p>The Long Beach port congestion could teach us a lot about data science in real world.</p>
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="../archive/posts/2021-11-18-what-can-we-learn-from-shipping-crisis-as-a-data-scientist.html">
+<div class="listing-date">
+Nov 18, 2021
+</div>
+<div class="listing-author">
+noklam
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="6" data-categories="python" data-listing-date-sort="1629244800000" data-listing-file-modified-sort="1681605466187" data-listing-reading-time-sort="1.455">
+<div class="thumbnail">
+<p><a href="../archive/posts/2021-08-18-python-file-not-found-long-file-path-window.html"> <img src="../archive/posts/images/file_not_found/01.jpg " class="thumnail-image"> </a></p>
+</div>
+<div class="body">
+<a href="../archive/posts/2021-08-18-python-file-not-found-long-file-path-window.html">
+<h3 class="no-anchor listing-title">
+Python FileNotFoundError or You have a really long file path?
+</h3>
+<div class="listing-subtitle">
+
+</div>
+</a>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('python'); return false;">
+python
+</div>
+</div>
+<a href="../archive/posts/2021-08-18-python-file-not-found-long-file-path-window.html">
+<div class="listing-description">
+<p>Today I encountered an interesting bug that I think it is worth to write it down for my future self.</p>
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="../archive/posts/2021-08-18-python-file-not-found-long-file-path-window.html">
+<div class="listing-date">
+Aug 18, 2021
+</div>
+<div class="listing-author">
+noklam
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="7" data-categories="python,design pattern,software" data-listing-date-sort="1625875200000" data-listing-file-modified-sort="1681605466219" data-listing-reading-time-sort="3.035">
+<div class="thumbnail">
+<a href="../archive/posts/2021-07-10-5minutes-data-science-design-pattern-callback.html">
+<div class="thumbnail-image">
+
+</div>
+</a><p><a href="../archive/posts/2021-07-10-5minutes-data-science-design-pattern-callback.html"></a></p>
+</div>
+<div class="body">
+<a href="../archive/posts/2021-07-10-5minutes-data-science-design-pattern-callback.html">
+<h3 class="no-anchor listing-title">
+5 Minutes Data Science Design Patterns I - Callback
+</h3>
+<div class="listing-subtitle">
+
+</div>
+</a>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('python'); return false;">
+python
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('design pattern'); return false;">
+design pattern
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('software'); return false;">
+software
+</div>
+</div>
+<a href="../archive/posts/2021-07-10-5minutes-data-science-design-pattern-callback.html">
+<div class="listing-description">
+<p>A mini collections of design pattern for Data Science - Starting with callbacks.</p>
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="../archive/posts/2021-07-10-5minutes-data-science-design-pattern-callback.html">
+<div class="listing-date">
+Jul 10, 2021
+</div>
+<div class="listing-author">
+noklam
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="8" data-categories="python" data-listing-date-sort="1624147200000" data-listing-file-modified-sort="1681605423307" data-listing-reading-time-sort="1.61">
+<div class="thumbnail">
+<a href="../archive/posts/2021-06-20-logging-config-dict-issue-kedro.html">
+<div class="thumbnail-image">
+
+</div>
+</a><p><a href="../archive/posts/2021-06-20-logging-config-dict-issue-kedro.html"></a></p>
+</div>
+<div class="body">
+<a href="../archive/posts/2021-06-20-logging-config-dict-issue-kedro.html">
+<h3 class="no-anchor listing-title">
+A logging.config.dictConfig() issue in python
+</h3>
+<div class="listing-subtitle">
+
+</div>
+</a>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('python'); return false;">
+python
+</div>
+</div>
+<a href="../archive/posts/2021-06-20-logging-config-dict-issue-kedro.html">
+<div class="listing-description">
+<p>logging.config.dictConfig()</p>
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="../archive/posts/2021-06-20-logging-config-dict-issue-kedro.html">
+<div class="listing-date">
+Jun 20, 2021
+</div>
+<div class="listing-author">
+noklam
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="9" data-categories="python-internal" data-listing-date-sort="1622246400000" data-listing-file-modified-sort="1681605466119" data-listing-reading-time-sort="1.63">
+<div class="thumbnail">
+<a href="../archive/posts/2021-05-29-python-internal-series-python-gil-and-memory.html">
+<div class="thumbnail-image">
+
+</div>
+</a><p><a href="../archive/posts/2021-05-29-python-internal-series-python-gil-and-memory.html"></a></p>
+</div>
+<div class="body">
+<a href="../archive/posts/2021-05-29-python-internal-series-python-gil-and-memory.html">
+<h3 class="no-anchor listing-title">
+Python Internal Series - Global Interpreter Lock (GIL) and Memory Management
+</h3>
+<div class="listing-subtitle">
+
+</div>
+</a>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('python-internal'); return false;">
+python-internal
+</div>
+</div>
+<a href="../archive/posts/2021-05-29-python-internal-series-python-gil-and-memory.html">
+<div class="listing-description">
+<p>Despite the bad reputation of GIL, it was arguably designed on purpose. The GIL actually comes with a lot of benefit.</p>
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="../archive/posts/2021-05-29-python-internal-series-python-gil-and-memory.html">
+<div class="listing-date">
+May 29, 2021
+</div>
+<div class="listing-author">
+noklam
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="10" data-categories="fsdl" data-listing-date-sort="1618531200000" data-listing-file-modified-sort="1681605466239" data-listing-reading-time-sort="1.025">
+<div class="thumbnail">
+<p><a href="../archive/posts/2021-04-16-full-stack-deep-learning-lecture-03.html"> <img src="../archive/posts/images/rnn.png" class="thumnail-image"> </a></p>
+</div>
+<div class="body">
+<a href="../archive/posts/2021-04-16-full-stack-deep-learning-lecture-03.html">
+<h3 class="no-anchor listing-title">
+Full Stack Deep Learning Notes - Lecture 03 - Recurrent Neural Network
+</h3>
+<div class="listing-subtitle">
+
+</div>
+</a>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('fsdl'); return false;">
+fsdl
+</div>
+</div>
+<a href="../archive/posts/2021-04-16-full-stack-deep-learning-lecture-03.html">
+<div class="listing-description">
+<p>Lecture &amp; Lab notes - This lecture is about Recurrent Neural Network. Key concetps included input gate, forget gate, cell state, and output gate. It also explains how attention mechanism works for a encoder-decoder based architecture.</p>
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="../archive/posts/2021-04-16-full-stack-deep-learning-lecture-03.html">
+<div class="listing-date">
+Apr 16, 2021
+</div>
+<div class="listing-author">
+noklam
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="11" data-categories="azure" data-listing-date-sort="1616803200000" data-listing-file-modified-sort="1681605466303" data-listing-reading-time-sort="4.74">
+<div class="thumbnail">
+<a href="../archive/posts/2021-03-27-microsoft-azure-dp100.html">
+<div class="thumbnail-image">
+
+</div>
+</a><p><a href="../archive/posts/2021-03-27-microsoft-azure-dp100.html"></a></p>
+</div>
+<div class="body">
+<a href="../archive/posts/2021-03-27-microsoft-azure-dp100.html">
+<h3 class="no-anchor listing-title">
+Microsoft Azure - DP100
+</h3>
+<div class="listing-subtitle">
+
+</div>
+</a>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('azure'); return false;">
+azure
+</div>
+</div>
+<a href="../archive/posts/2021-03-27-microsoft-azure-dp100.html">
+<div class="listing-description">
+<p>This note helps you to prepare the Azure Assoicate Data Scientist DP-100 exam. I took DP100 in Mar 2021 and includes some important notes for study. Particularly, syntax types questions are very common. You need to study the lab and make sure you understand and remember some syntax to pass this exam.</p>
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="../archive/posts/2021-03-27-microsoft-azure-dp100.html">
+<div class="listing-date">
+Mar 27, 2021
+</div>
+<div class="listing-author">
+noklam
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="12" data-categories="fsdl" data-listing-date-sort="1616284800000" data-listing-file-modified-sort="1681605466259" data-listing-reading-time-sort="3.28">
+<div class="thumbnail">
+<a href="../archive/posts/2021-03-21-full-stack-deep-learning-lecture-01.html">
+<div class="thumbnail-image">
+
+</div>
+</a><p><a href="../archive/posts/2021-03-21-full-stack-deep-learning-lecture-01.html"></a></p>
+</div>
+<div class="body">
+<a href="../archive/posts/2021-03-21-full-stack-deep-learning-lecture-01.html">
+<h3 class="no-anchor listing-title">
+Full Stack Deep Learning Notes - Lecture 01
+</h3>
+<div class="listing-subtitle">
+
+</div>
+</a>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('fsdl'); return false;">
+fsdl
+</div>
+</div>
+<a href="../archive/posts/2021-03-21-full-stack-deep-learning-lecture-01.html">
+<div class="listing-description">
+<p>Lecture &amp; Lab notes, explain <code>DataModules</code>, <code>Trainer</code> <code>LightningModule</code>.</p>
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="../archive/posts/2021-03-21-full-stack-deep-learning-lecture-01.html">
+<div class="listing-date">
+Mar 21, 2021
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="13" data-categories="python" data-listing-date-sort="1615939200000" data-listing-file-modified-sort="1681605466107" data-listing-reading-time-sort="0.485">
+<div class="thumbnail">
+<a href="../archive/posts/2021-03-17-pytest-data-test-truncated-error.html">
+<div class="thumbnail-image">
+
+</div>
+</a><p><a href="../archive/posts/2021-03-17-pytest-data-test-truncated-error.html"></a></p>
+</div>
+<div class="body">
+<a href="../archive/posts/2021-03-17-pytest-data-test-truncated-error.html">
+<h3 class="no-anchor listing-title">
+Data Test as CI
+</h3>
+<div class="listing-subtitle">
+
+</div>
+</a>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('python'); return false;">
+python
+</div>
+</div>
+<a href="../archive/posts/2021-03-17-pytest-data-test-truncated-error.html">
+<div class="listing-description">
+<p>Unit Test with Pytest. I want to display a full information rich string into my CI Log, but it is trimmed by Python. Here is a simple fix to make it display full string in the log file.</p>
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="../archive/posts/2021-03-17-pytest-data-test-truncated-error.html">
+<div class="listing-date">
+Mar 17, 2021
+</div>
+<div class="listing-author">
+noklam
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="14" data-categories="python,cli,typer" data-listing-date-sort="1607558400000" data-listing-file-modified-sort="1681605466271" data-listing-reading-time-sort="1.39">
+<div class="thumbnail">
+<a href="../archive/posts/2020-12-10-typer-create-command-line-and-use-it-anywhere.html">
+<div class="thumbnail-image">
+
+</div>
+</a><p><a href="../archive/posts/2020-12-10-typer-create-command-line-and-use-it-anywhere.html"></a></p>
+</div>
+<div class="body">
+<a href="../archive/posts/2020-12-10-typer-create-command-line-and-use-it-anywhere.html">
+<h3 class="no-anchor listing-title">
+Create python command line in few lines, and use it anywhere as a standalone tool!
+</h3>
+<div class="listing-subtitle">
+
+</div>
+</a>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('python'); return false;">
+python
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('cli'); return false;">
+cli
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('typer'); return false;">
+typer
+</div>
+</div>
+<a href="../archive/posts/2020-12-10-typer-create-command-line-and-use-it-anywhere.html">
+<div class="listing-description">
+<p>Creating python command line could be useful for a lot of tools. Traditionally, <code>argparse</code> has been used heavily, a new library called <code>typer</code> leverage python type hint, that makes creating command line interface in Python much pleasant.</p>
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="../archive/posts/2020-12-10-typer-create-command-line-and-use-it-anywhere.html">
+<div class="listing-date">
+Dec 10, 2020
+</div>
+<div class="listing-author">
+noklam
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="15" data-categories="python" data-listing-date-sort="1604966400000" data-listing-file-modified-sort="1681605466083" data-listing-reading-time-sort="0.26">
+<div class="thumbnail">
+<a href="../archive/posts/2020-11-10-pandas memory optimization.html">
+<div class="thumbnail-image">
+
+</div>
+</a><p><a href="../archive/posts/2020-11-10-pandas memory optimization.html"></a></p>
+</div>
+<div class="body">
+<a href="../archive/posts/2020-11-10-pandas memory optimization.html">
+<h3 class="no-anchor listing-title">
+Optimizing pandas - Reducing 90% memory footprint - updated version
+</h3>
+<div class="listing-subtitle">
+
+</div>
+</a>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('python'); return false;">
+python
+</div>
+</div>
+<a href="../archive/posts/2020-11-10-pandas memory optimization.html">
+<div class="listing-description">
+<p>Have you ever deal with data files that does not fit into your memory? Here is a function that just trim memory footprint for you. This post is base on https://www.dataquest.io/blog/pandas-big-data/ and updated with a new automated functions from https://github.com/ianozsvald/dtype_diet/blob/master/dtype_diet.py</p>
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="../archive/posts/2020-11-10-pandas memory optimization.html">
+<div class="listing-date">
+Nov 10, 2020
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="16" data-categories="python,kaggle" data-listing-date-sort="1584748800000" data-listing-file-modified-sort="1681605466291" data-listing-reading-time-sort="8.175">
+<div class="thumbnail">
+<p><a href="../archive/posts/2020-03-21-10-lessons-learnt-from-kaggle-competition.html"> <img src="../archive/posts/images/bengali_00_header.png" class="thumnail-image"> </a></p>
+</div>
+<div class="body">
+<a href="../archive/posts/2020-03-21-10-lessons-learnt-from-kaggle-competition.html">
+<h3 class="no-anchor listing-title">
+Lesson learnt from Kaggle - Bengali Image Classification Competition
+</h3>
+<div class="listing-subtitle">
+
+</div>
+</a>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('python'); return false;">
+python
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('kaggle'); return false;">
+kaggle
+</div>
+</div>
+<a href="../archive/posts/2020-03-21-10-lessons-learnt-from-kaggle-competition.html">
+<div class="listing-description">
+<p>My first silver medal on Kaggles Competition - Bengali Image Classification Competition. 10 lessons learn!</p>
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="../archive/posts/2020-03-21-10-lessons-learnt-from-kaggle-competition.html">
+<div class="listing-date">
+Mar 21, 2020
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="17" data-categories="python,fastai" data-listing-date-sort="1582329600000" data-listing-file-modified-sort="1681605466207" data-listing-reading-time-sort="2.785">
+<div class="thumbnail">
+<a href="../archive/posts/2020-02-22-python-dynamic-dispatch.html">
+<div class="thumbnail-image">
+
+</div>
+</a><p><a href="../archive/posts/2020-02-22-python-dynamic-dispatch.html"></a></p>
+</div>
+<div class="body">
+<a href="../archive/posts/2020-02-22-python-dynamic-dispatch.html">
+<h3 class="no-anchor listing-title">
+The missing piece in Python tutorial - What is dispatch why you should care
+</h3>
+<div class="listing-subtitle">
+
+</div>
+</a>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('python'); return false;">
+python
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('fastai'); return false;">
+fastai
+</div>
+</div>
+<a href="../archive/posts/2020-02-22-python-dynamic-dispatch.html">
+<div class="listing-description">
+<p>Dispatch is an amazing useful features which is underused in Python. In this article, I will show you how you can use it to make Python more powerful.</p>
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="../archive/posts/2020-02-22-python-dynamic-dispatch.html">
+<div class="listing-date">
+Feb 22, 2020
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="18" data-categories="python" data-listing-date-sort="1571443200000" data-listing-file-modified-sort="1681605423303" data-listing-reading-time-sort="0.645">
+<div class="thumbnail">
+<a href="../archive/posts/2019-10-19-Deskto-Notification.html">
+<div class="thumbnail-image">
+
+</div>
+</a><p><a href="../archive/posts/2019-10-19-Deskto-Notification.html"></a></p>
+</div>
+<div class="body">
+<a href="../archive/posts/2019-10-19-Deskto-Notification.html">
+<h3 class="no-anchor listing-title">
+plyer - Desktop Notification with Python
+</h3>
+<div class="listing-subtitle">
+
+</div>
+</a>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('python'); return false;">
+python
+</div>
+</div>
+<a href="../archive/posts/2019-10-19-Deskto-Notification.html">
+<div class="listing-description">
+<p>Desktop notifiaction with Python</p>
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="../archive/posts/2019-10-19-Deskto-Notification.html">
+<div class="listing-date">
+Oct 19, 2019
+</div>
+<div class="listing-author">
+noklam
+</div>
+</a>
+</div>
+</div>
+</div>
+<div class="listing-no-matching d-none">
+No matching items
+</div>
+</div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

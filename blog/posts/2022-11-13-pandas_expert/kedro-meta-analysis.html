@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.475">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2022-11-13">
+<meta name="description" content="Meta-analysis of the kedro codebase">
+
+<title>noklam - Understanding the Kedro codebase - A quick dirty meta-analysis - (Part I)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-83544344-5', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../../../styles.css">
+<meta property="og:title" content="noklam - Understanding the Kedro codebase - A quick dirty meta-analysis - (Part I)">
+<meta property="og:description" content="Meta-analysis of the kedro codebase">
+<meta property="og:site-name" content="noklam">
+<meta name="twitter:title" content="noklam - Understanding the Kedro codebase - A quick dirty meta-analysis - (Part I)">
+<meta name="twitter:description" content="Meta-analysis of the kedro codebase">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">noklam</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../blog/index.html">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../archive/index.html">
+ <span class="menu-text">Archive</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/noklam"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Understanding the Kedro codebase - A quick dirty meta-analysis - (Part I)</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../blog/" class="sidebar-item-text sidebar-link">Blog</a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#clean-up-the-dictionary-a-little-bit" id="toc-clean-up-the-dictionary-a-little-bit" class="nav-link active" data-scroll-target="#clean-up-the-dictionary-a-little-bit">Clean up the dictionary a little bit</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/noklam/noklam/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Understanding the Kedro codebase - A quick dirty meta-analysis - (Part I)</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">kedro</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    Meta-analysis of the kedro codebase
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">2022-11-13</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<div class="quarto-video ratio ratio-16x9"><iframe src="https://www.youtube.com/embed/pjq3QOxl9Ok" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>Inspired by this talk</p>
+<div class="cell" data-vscode="{&quot;languageId&quot;:&quot;python&quot;}">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> collections <span class="im">import</span> Counter</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-vscode="{&quot;languageId&quot;:&quot;python&quot;}">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>REPO_PATH <span class="op">=</span> Path(<span class="st">"/Users/Nok_Lam_Chan/GitHub/kedro"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">list</span>(REPO_PATH.iterdir())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>[PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/test_requirements.txt'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/CODE_OF_CONDUCT.md'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/LICENSE.md'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tools'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro_technical_charter.pdf'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/.DS_Store'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/test'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/.pytest_cache'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/derby.log'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/iris'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro.egg-info'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/.pre-commit-config.yaml'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/.coverage'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/Makefile'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/CITATION.cff'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/CODEOWNERS'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/iris-demo'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/pyproject.toml'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/features'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/trufflehog-ignore.txt'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/dependency'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/MANIFEST.in'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/docs'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/.readthedocs.yml'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/dep_tree.log'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/README.md'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/RELEASE.md'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/setup.py'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/demo-project'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/logs'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/.mypy_cache'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/.gitignore'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/static'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/CONTRIBUTING.md'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/behave.ini'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/.github'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/resume-kedro'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/.gitpod.yml'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/info.log'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/coverage.xml'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/errors.log'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/.git'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/htmlcov'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/.vscode'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/data'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/conf'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/.circleci'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/import.log'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/notebooks'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/.run'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/.idea'),
+ PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/src')]</code></pre>
+</div>
+</div>
+<div class="cell" data-vscode="{&quot;languageId&quot;:&quot;python&quot;}">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> count_effective_line(counter, fn):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span> (fn) <span class="im">as</span> f:</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> line <span class="kw">in</span> f:</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>            counter[fn] <span class="op">+=</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-vscode="{&quot;languageId&quot;:&quot;python&quot;}">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>lines_count <span class="op">=</span> Counter()</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> fn <span class="kw">in</span> REPO_PATH.rglob(<span class="st">"*/*.py"</span>):</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#     print(fn)</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    count_effective_line(lines_count, fn)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(lines_count)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Counter({PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/spark/test_spark_dataset.py'): 984, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/pipeline/test_pipeline.py'): 940, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/pipeline/pipeline.py'): 926, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/session/test_session.py'): 891, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/cli/micropkg.py'): 854, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/cli/micropkg/test_micropkg_pull.py'): 846, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/io/core.py'): 748, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/cli/test_cli.py'): 730, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/io/test_data_catalog.py'): 685, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/cli/test_starters.py'): 639, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/features/steps/cli_steps.py'): 623, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/pipeline/node.py'): 612, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/docs/conf.py'): 598, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/io/data_catalog.py'): 594, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/docs/build/conf.py'): 587, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/cli/micropkg/test_micropkg_package.py'): 581, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/session/test_session_extension_hooks.py'): 576, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/io/test_partitioned_dataset.py'): 565, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/cli/starters.py'): 552, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/io/partitioned_dataset.py'): 551, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/cli/pipeline/test_pipeline.py'): 522, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/io/test_incremental_dataset.py'): 503, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/context/test_context.py'): 485, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/config/test_templated_config.py'): 482, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/cli/test_project.py'): 479, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/cli/test_jupyter.py'): 470, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/cli/utils.py'): 469, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/runner/runner.py'): 456, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/tensorflow/test_tensorflow_model_dataset.py'): 441, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/pandas/sql_dataset.py'): 438, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/matplotlib/test_matplotlib_writer.py'): 436, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/pipeline/test_node.py'): 434, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/session/session.py'): 423, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/spark/spark_dataset.py'): 422, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/pipeline/test_modular_pipeline.py'): 418, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/runner/test_parallel_runner.py'): 401, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/cli/project.py'): 392, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/pipeline/test_pipeline_with_transcoding.py'): 391, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/pandas/test_generic_dataset.py'): 383, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/session/conftest.py'): 381, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/pandas/test_sql_dataset.py'): 374, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/project/__init__.py'): 369, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/config/test_config.py'): 354, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/runner/parallel_runner.py'): 353, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/context/context.py'): 345, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/pandas/test_parquet_dataset.py'): 344, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/cli/pipeline.py'): 336, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/pandas/test_gbq_dataset.py'): 315, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/spark/test_spark_hive_dataset.py'): 314, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/pandas/gbq_dataset.py'): 314, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/cli/test_catalog.py'): 305, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/ipython/test_ipython.py'): 304, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/pandas/test_csv_dataset.py'): 300, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/hooks/specs.py'): 296, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/pipeline/modular_pipeline.py'): 290, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/cli/jupyter.py'): 282, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/pandas/test_excel_dataset.py'): 281, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/config/templated_config.py'): 281, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/resume-kedro/src/build/lib/resume_kedro/dagascii.py'): 275, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/runner/test_sequential_runner.py'): 273, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/pickle/test_pickle_dataset.py'): 269, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/cli/micropkg/test_micropkg_requirements.py'): 266, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/project/test_pipeline_discovery.py'): 260, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/pandas/excel_dataset.py'): 254, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/test_startup.py'): 250, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/config/common.py'): 248, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/pandas/generic_dataset.py'): 246, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/pandas/test_hdf_dataset.py'): 245, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/matplotlib/matplotlib_writer.py'): 243, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/pickle/pickle_dataset.py'): 243, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/pandas/test_xml_dataset.py'): 241, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/pandas/test_json_dataset.py'): 241, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/geojson/test_geojson_dataset.py'): 232, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/pillow/test_image_dataset.py'): 231, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/pandas/parquet_dataset.py'): 230, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/pipeline/test_pipeline_from_missing.py'): 227, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/io/test_memory_dataset.py'): 226, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/networkx/test_json_dataset.py'): 226, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/email/test_message_dataset.py'): 226, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/iris/docs/source/conf.py'): 225, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/iris-demo/docs/source/conf.py'): 225, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/resume-kedro/docs/source/conf.py'): 225, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/test/docs/source/conf.py'): 224, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/templates/project/{{ cookiecutter.repo_name }}/docs/source/conf.py'): 224, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/features/steps/test_starter/{{ cookiecutter.repo_name }}/docs/source/conf.py'): 222, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/holoviews/test_holoviews_writer.py'): 220, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/pandas/test_feather_dataset.py'): 220, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/spark/spark_hive_dataset.py'): 220, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/runner/test_thread_runner.py'): 213, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/cli/cli.py'): 211, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/yaml/test_yaml_dataset.py'): 210, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/pandas/hdf_dataset.py'): 204, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/json/test_json_dataset.py'): 200, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/io/test_lambda_dataset.py'): 194, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/tracking/test_metrics_dataset.py'): 194, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/pandas/csv_dataset.py'): 194, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/pandas/feather_dataset.py'): 191, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/redis/redis_dataset.py'): 189, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/networkx/test_gml_dataset.py'): 188, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/networkx/test_graphml_dataset.py'): 188, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/tensorflow/tensorflow_model_dataset.py'): 188, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/email/message_dataset.py'): 188, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/text/test_text_dataset.py'): 187, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/pandas/json_dataset.py'): 187, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/tracking/test_json_dataset.py'): 185, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/cli/catalog.py'): 176, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/spark/spark_jdbc_dataset.py'): 175, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/pandas/xml_dataset.py'): 171, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/api/test_api_dataset.py'): 170, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/runner/conftest.py'): 168, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/redis/test_redis_dataset.py'): 165, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/ipython/__init__.py'): 164, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/dask/test_parquet_dataset.py'): 162, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/json/json_dataset.py'): 160, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/cli/conftest.py'): 159, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/geopandas/geojson_dataset.py'): 157, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/startup.py'): 156, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/runner/thread_runner.py'): 156, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/yaml/yaml_dataset.py'): 155, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/tools/test_cli.py'): 154, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/plotly/json_dataset.py'): 154, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/networkx/json_dataset.py'): 150, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/networkx/gml_dataset.py'): 145, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/networkx/graphml_dataset.py'): 143, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/io/test_cached_dataset.py'): 142, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/pillow/image_dataset.py'): 142, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/api/api_dataset.py'): 142, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/pipeline/test_node_run.py'): 141, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/biosequence/biosequence_dataset.py'): 137, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/holoviews/holoviews_writer.py'): 137, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/dask/parquet_dataset.py'): 136, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/config/config.py'): 134, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/io/memory_dataset.py'): 132, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/text/text_dataset.py'): 131, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/features/environment.py'): 128, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/cli/test_cli_hooks.py'): 128, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/session/test_session_hook_manager.py'): 126, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/spark/test_spark_jdbc_dataset.py'): 121, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/plotly/plotly_dataset.py'): 117, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/io/cached_dataset.py'): 113, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/io/lambda_dataset.py'): 113, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/plotly/test_plotly_dataset.py'): 108, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/spark/deltatable_dataset.py'): 108, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/bioinformatics/test_biosequence_dataset.py'): 107, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/hooks/manager.py'): 106, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/features/steps/sh_run.py'): 105, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/project/test_settings.py'): 102, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/plotly/test_json_dataset.py'): 101, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/io/test_core.py'): 96, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/logging/color_logger.py'): 95, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/conftest.py'): 89, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/session/test_store.py'): 89, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/spark/test_deltatable_dataset.py'): 89, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/cli/test_registry.py'): 88, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/runner/sequential_runner.py'): 87, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/features/steps/util.py'): 84, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/pipeline/test_pipeline_integration.py'): 84, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/cli/pipeline/conftest.py'): 84, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/features/steps/test_starter/{{ cookiecutter.repo_name }}/src/{{ cookiecutter.python_package }}/pipelines/data_science/nodes.py'): 80, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/project/test_pipeline_registry.py'): 79, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/cli/micropkg/conftest.py'): 79, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/hooks/test_manager.py'): 75, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/iris/src/iris/nodes.py'): 74, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/iris-demo/src/iris_demo/nodes.py'): 74, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/resume-kedro/src/resume_kedro/nodes.py'): 74, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/resume-kedro/src/build/lib/resume_kedro/nodes.py'): 74, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/tracking/metrics_dataset.py'): 68, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/spark/test_memory_dataset.py'): 67, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tools/cli.py'): 62, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/iris-demo/src/iris_demo/settings.py'): 62, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/project/test_logging.py'): 58, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/resume-kedro/src/build/lib/resume_kedro/settings.py'): 56, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/features/steps/test_starter/{{ cookiecutter.repo_name }}/src/{{ cookiecutter.python_package }}/pipelines/data_engineering/nodes.py'): 51, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/cli/registry.py'): 50, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/cli/hooks/manager.py'): 49, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/test/src/test/__main__.py'): 47, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/iris/src/iris/__main__.py'): 47, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/iris-demo/src/iris_demo/__main__.py'): 47, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/features/steps/test_starter/{{ cookiecutter.repo_name }}/src/{{ cookiecutter.python_package }}/__main__.py'): 47, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/resume-kedro/src/resume_kedro/__main__.py'): 47, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/resume-kedro/src/build/lib/resume_kedro/__main__.py'): 47, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/templates/project/{{ cookiecutter.repo_name }}/src/{{ cookiecutter.python_package }}/__main__.py'): 47, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/tracking/json_dataset.py'): 47, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/cli/hooks/specs.py'): 46, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/session/shelvestore.py'): 43, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/test/src/tests/test_run.py'): 41, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/spark/conftest.py'): 41, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/templates/project/{{ cookiecutter.repo_name }}/src/tests/test_run.py'): 41, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/features/steps/test_starter/{{ cookiecutter.repo_name }}/src/tests/test_run.py'): 40, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/test/src/setup.py'): 39, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/iris/src/tests/test_run.py'): 39, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/iris-demo/src/setup.py'): 39, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/iris-demo/src/tests/test_run.py'): 39, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/features/steps/test_starter/{{ cookiecutter.repo_name }}/src/setup.py'): 39, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/features/steps/test_starter/{{ cookiecutter.repo_name }}/src/{{ cookiecutter.python_package }}/settings.py'): 39, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/resume-kedro/src/tests/test_run.py'): 39, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/resume-kedro/src/resume_kedro/pipeline.py'): 39, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/config/abstract_config.py'): 39, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/session/store.py'): 39, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/templates/project/{{ cookiecutter.repo_name }}/src/setup.py'): 39, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/templates/project/{{ cookiecutter.repo_name }}/src/{{ cookiecutter.python_package }}/settings.py'): 39, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/pandas/__init__.py'): 39, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/resume-kedro/src/build/lib/resume_kedro/pipeline.py'): 38, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/test/src/test/settings.py'): 37, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/iris/src/setup.py'): 37, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/iris/src/iris/settings.py'): 37, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/resume-kedro/src/setup.py'): 37, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/datasets/conftest.py'): 35, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/iris/src/iris/pipeline.py'): 33, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/iris-demo/src/iris_demo/pipeline.py'): 33, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/io/__init__.py'): 33, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/test_utils.py'): 30, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/utils.py'): 28, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/features/steps/test_plugin/plugin.py'): 27, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/features/steps/test_starter/{{ cookiecutter.repo_name }}/src/{{ cookiecutter.python_package }}/pipelines/data_science/pipeline.py'): 27, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tools/circleci/github_scripts/kedro_version.py'): 26, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/features/steps/test_starter/{{ cookiecutter.repo_name }}/src/{{ cookiecutter.python_package }}/pipelines/data_engineering/pipeline.py'): 26, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/iris/src/settings.py'): 24, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/framework/cli/hooks/test_manager.py'): 22, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/extensions/ipython.py'): 22, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/features/steps/test_starter/{{ cookiecutter.repo_name }}/src/{{ cookiecutter.python_package }}/pipeline_registry.py'): 19, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/config/__init__.py'): 19, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/iris/src/iris/pipeline_registry.py'): 18, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/iris-demo/src/iris_demo/pipeline_registry.py'): 18, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/resume-kedro/src/resume_kedro/pipeline_registry.py'): 18, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/resume-kedro/src/build/lib/resume_kedro/pipeline_registry.py'): 18, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/tests/extras/logging/test_color_logger.py'): 16, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/runner/__init__.py'): 16, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/templates/project/{{ cookiecutter.repo_name }}/src/{{ cookiecutter.python_package }}/pipeline_registry.py'): 16, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/logging/__init__.py'): 15, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/networkx/__init__.py'): 15, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/spark/__init__.py'): 14, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/test/src/test/pipeline_registry.py'): 13, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/features/steps/test_plugin/setup.py'): 12, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/__init__.py'): 11, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/hooks/markers.py'): 11, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/plotly/__init__.py'): 11, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/api/__init__.py'): 11, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/tracking/__init__.py'): 11, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/__main__.py'): 10, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/cli/hooks/markers.py'): 10, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/templates/pipeline/{{ cookiecutter.pipeline_name }}/__init__.py'): 10, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/templates/pipeline/{{ cookiecutter.pipeline_name }}/pipeline.py'): 10, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/iris/src/tests/test_pipeline.py'): 9, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/iris-demo/src/tests/test_pipeline.py'): 9, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/resume-kedro/src/tests/test_pipeline.py'): 9, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/pipeline/__init__.py'): 9, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/templates/pipeline/{{ cookiecutter.pipeline_name }}/tests/test_pipeline.py'): 9, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/dask/__init__.py'): 8, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/redis/__init__.py'): 8, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/geopandas/__init__.py'): 8, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/pillow/__init__.py'): 8, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/json/__init__.py'): 8, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/biosequence/__init__.py'): 8, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/tensorflow/__init__.py'): 8, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/matplotlib/__init__.py'): 8, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/yaml/__init__.py'): 8, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/pickle/__init__.py'): 8, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/text/__init__.py'): 8, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/holoviews/__init__.py'): 8, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/email/__init__.py'): 8, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/features/steps/test_starter/{{ cookiecutter.repo_name }}/src/{{ cookiecutter.python_package }}/pipelines/data_science/__init__.py'): 7, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/features/steps/test_starter/{{ cookiecutter.repo_name }}/src/{{ cookiecutter.python_package }}/pipelines/data_engineering/__init__.py'): 7, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/context/__init__.py'): 7, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/cli/__init__.py'): 7, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/session/__init__.py'): 6, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/hooks/__init__.py'): 5, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/cli/hooks/__init__.py'): 5, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/test/src/test/__init__.py'): 4, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/iris/src/iris/__init__.py'): 4, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/iris-demo/src/iris_demo/__init__.py'): 4, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/features/steps/test_starter/{{ cookiecutter.repo_name }}/src/{{ cookiecutter.python_package }}/__init__.py'): 4, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/resume-kedro/src/resume_kedro/__init__.py'): 4, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/resume-kedro/src/build/lib/resume_kedro/__init__.py'): 4, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/templates/pipeline/{{ cookiecutter.pipeline_name }}/nodes.py'): 4, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/templates/project/{{ cookiecutter.repo_name }}/src/{{ cookiecutter.python_package }}/__init__.py'): 4, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/resume-kedro/src/resume_kedro/settings.py'): 3, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/datasets/__init__.py'): 3, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/extensions/__init__.py'): 3, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/extras/__init__.py'): 2, PosixPath('/Users/Nok_Lam_Chan/GitHub/kedro/kedro/framework/__init__.py'): 1})</code></pre>
+</div>
+</div>
+<section id="clean-up-the-dictionary-a-little-bit" class="level1">
+<h1>Clean up the dictionary a little bit</h1>
+<div class="cell" data-vscode="{&quot;languageId&quot;:&quot;python&quot;}">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>line_counts_df <span class="op">=</span> pd.DataFrame(lines_count.items(), columns<span class="op">=</span>[<span class="st">"fullpath"</span>,<span class="st">"line_of_code"</span>])</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>line_counts_df[<span class="st">"fullpath"</span>] <span class="op">=</span> line_counts_df[<span class="st">"fullpath"</span>].<span class="bu">apply</span>(<span class="bu">str</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>line_counts_df[<span class="st">"fullpath"</span>] <span class="op">=</span>  line_counts_df[<span class="st">"fullpath"</span>].<span class="bu">str</span>.replace(<span class="st">"/Users/Nok_Lam_Chan/GitHub/kedro/"</span>, <span class="st">""</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>line_counts_df.head(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>fullpath</th>
+      <th>line_of_code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>tools/cli.py</td>
+      <td>62</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>features/environment.py</td>
+      <td>128</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell" data-vscode="{&quot;languageId&quot;:&quot;python&quot;}">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>line_counts_df[[<span class="st">"toplevel"</span>,<span class="st">"module"</span>,<span class="st">"submodule"</span>,<span class="st">"filename"</span>]] <span class="op">=</span> line_counts_df[<span class="st">"fullpath"</span>].<span class="bu">str</span>.split(<span class="st">"/"</span>,expand<span class="op">=</span><span class="va">True</span>, n<span class="op">=</span><span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-vscode="{&quot;languageId&quot;:&quot;python&quot;}">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>line_counts_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>fullpath</th>
+      <th>line_of_code</th>
+      <th>toplevel</th>
+      <th>module</th>
+      <th>submodule</th>
+      <th>filename</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>tools/cli.py</td>
+      <td>62</td>
+      <td>tools</td>
+      <td>cli.py</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>features/environment.py</td>
+      <td>128</td>
+      <td>features</td>
+      <td>environment.py</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>tests/test_utils.py</td>
+      <td>30</td>
+      <td>tests</td>
+      <td>test_utils.py</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>tests/conftest.py</td>
+      <td>89</td>
+      <td>tests</td>
+      <td>conftest.py</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>docs/conf.py</td>
+      <td>598</td>
+      <td>docs</td>
+      <td>conf.py</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>276</th>
+      <td>kedro/extras/datasets/pandas/feather_dataset.py</td>
+      <td>191</td>
+      <td>kedro</td>
+      <td>extras</td>
+      <td>datasets</td>
+      <td>pandas/feather_dataset.py</td>
+    </tr>
+    <tr>
+      <th>277</th>
+      <td>kedro/extras/datasets/pandas/hdf_dataset.py</td>
+      <td>204</td>
+      <td>kedro</td>
+      <td>extras</td>
+      <td>datasets</td>
+      <td>pandas/hdf_dataset.py</td>
+    </tr>
+    <tr>
+      <th>278</th>
+      <td>kedro/extras/datasets/pandas/csv_dataset.py</td>
+      <td>194</td>
+      <td>kedro</td>
+      <td>extras</td>
+      <td>datasets</td>
+      <td>pandas/csv_dataset.py</td>
+    </tr>
+    <tr>
+      <th>279</th>
+      <td>kedro/extras/datasets/pandas/excel_dataset.py</td>
+      <td>254</td>
+      <td>kedro</td>
+      <td>extras</td>
+      <td>datasets</td>
+      <td>pandas/excel_dataset.py</td>
+    </tr>
+    <tr>
+      <th>280</th>
+      <td>kedro/extras/datasets/pandas/gbq_dataset.py</td>
+      <td>314</td>
+      <td>kedro</td>
+      <td>extras</td>
+      <td>datasets</td>
+      <td>pandas/gbq_dataset.py</td>
+    </tr>
+  </tbody>
+</table>
+<p>281 rows × 6 columns</p>
+</div>
+</div>
+</div>
+<div class="cell" data-vscode="{&quot;languageId&quot;:&quot;python&quot;}">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Sort by Top level module</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>line_counts_df.groupby([<span class="st">"toplevel"</span>]).<span class="bu">sum</span>().sort_values(ascending<span class="op">=</span><span class="va">False</span>, by <span class="op">=</span><span class="st">"line_of_code"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>line_of_code</th>
+    </tr>
+    <tr>
+      <th>toplevel</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>tests</th>
+      <td>25341</td>
+    </tr>
+    <tr>
+      <th>kedro</th>
+      <td>18683</td>
+    </tr>
+    <tr>
+      <th>features</th>
+      <td>1587</td>
+    </tr>
+    <tr>
+      <th>docs</th>
+      <td>1185</td>
+    </tr>
+    <tr>
+      <th>resume-kedro</th>
+      <td>1007</td>
+    </tr>
+    <tr>
+      <th>iris-demo</th>
+      <td>550</td>
+    </tr>
+    <tr>
+      <th>iris</th>
+      <td>547</td>
+    </tr>
+    <tr>
+      <th>test</th>
+      <td>405</td>
+    </tr>
+    <tr>
+      <th>tools</th>
+      <td>88</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Interstingly we have roughly a 1:1 ratio between <code>tests</code> and <code>kedro</code></p>
+<div class="cell" data-vscode="{&quot;languageId&quot;:&quot;python&quot;}">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>line_counts_df.groupby([<span class="st">"module"</span>,<span class="st">"submodule"</span>]).<span class="bu">sum</span>().sort_values(ascending<span class="op">=</span><span class="va">False</span>, by <span class="op">=</span><span class="st">"line_of_code"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th></th>
+      <th>line_of_code</th>
+    </tr>
+    <tr>
+      <th>module</th>
+      <th>submodule</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>extras</th>
+      <th>datasets</th>
+      <td>15775</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">framework</th>
+      <th>cli</th>
+      <td>8837</td>
+    </tr>
+    <tr>
+      <th>session</th>
+      <td>2574</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">pipeline</th>
+      <th>test_pipeline.py</th>
+      <td>940</td>
+    </tr>
+    <tr>
+      <th>pipeline.py</th>
+      <td>926</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>config</th>
+      <th>__init__.py</th>
+      <td>19</td>
+    </tr>
+    <tr>
+      <th>runner</th>
+      <th>__init__.py</th>
+      <td>16</td>
+    </tr>
+    <tr>
+      <th>pipeline</th>
+      <th>__init__.py</th>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>extras</th>
+      <th>__init__.py</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>framework</th>
+      <th>__init__.py</th>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+<p>74 rows × 1 columns</p>
+</div>
+</div>
+</div>
+<div class="cell" data-vscode="{&quot;languageId&quot;:&quot;python&quot;}">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Sort by Sub-module</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>kedro_line_counts_df <span class="op">=</span> line_counts_df[line_counts_df[<span class="st">"toplevel"</span>] <span class="op">==</span> <span class="st">"kedro"</span>]</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>tmp <span class="op">=</span> kedro_line_counts_df.groupby(<span class="st">"module"</span>).<span class="bu">sum</span>().rename(mapper<span class="op">=</span>{<span class="st">"line_of_code"</span>: <span class="st">"module_line_of_code"</span>},axis<span class="op">=</span><span class="dv">1</span> )</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>kedro_line_counts_df_group <span class="op">=</span> kedro_line_counts_df.groupby([<span class="st">"module"</span>,<span class="st">"submodule"</span>]).<span class="bu">sum</span>().reset_index().merge(tmp, left_on<span class="op">=</span><span class="st">"module"</span>, right_on<span class="op">=</span><span class="st">"module"</span>)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co"># .sort_values(ascending=False, by ="line_of_code")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-vscode="{&quot;languageId&quot;:&quot;python&quot;}">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>kedro_line_counts_df.groupby([<span class="st">"module"</span>]).<span class="bu">sum</span>().sort_values(ascending<span class="op">=</span><span class="va">False</span>, by <span class="op">=</span><span class="st">"line_of_code"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>line_of_code</th>
+    </tr>
+    <tr>
+      <th>module</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>extras</th>
+      <td>6871</td>
+    </tr>
+    <tr>
+      <th>framework</th>
+      <td>5246</td>
+    </tr>
+    <tr>
+      <th>io</th>
+      <td>2284</td>
+    </tr>
+    <tr>
+      <th>pipeline</th>
+      <td>1837</td>
+    </tr>
+    <tr>
+      <th>runner</th>
+      <td>1068</td>
+    </tr>
+    <tr>
+      <th>config</th>
+      <td>721</td>
+    </tr>
+    <tr>
+      <th>templates</th>
+      <td>443</td>
+    </tr>
+    <tr>
+      <th>ipython</th>
+      <td>164</td>
+    </tr>
+    <tr>
+      <th>utils.py</th>
+      <td>28</td>
+    </tr>
+    <tr>
+      <th>__init__.py</th>
+      <td>11</td>
+    </tr>
+    <tr>
+      <th>__main__.py</th>
+      <td>10</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell" data-vscode="{&quot;languageId&quot;:&quot;python&quot;}">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sort by file </span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>kedro_line_counts_df_group.sort_values(ascending<span class="op">=</span><span class="va">False</span>, by <span class="op">=</span>[<span class="st">"module_line_of_code"</span>,<span class="st">"line_of_code"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>module</th>
+      <th>submodule</th>
+      <th>line_of_code</th>
+      <th>module_line_of_code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>6</th>
+      <td>extras</td>
+      <td>datasets</td>
+      <td>6734</td>
+      <td>6871</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>extras</td>
+      <td>logging</td>
+      <td>110</td>
+      <td>6871</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>extras</td>
+      <td>extensions</td>
+      <td>25</td>
+      <td>6871</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>extras</td>
+      <td>__init__.py</td>
+      <td>2</td>
+      <td>6871</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>framework</td>
+      <td>cli</td>
+      <td>3439</td>
+      <td>5246</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>framework</td>
+      <td>session</td>
+      <td>511</td>
+      <td>5246</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>framework</td>
+      <td>hooks</td>
+      <td>418</td>
+      <td>5246</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>framework</td>
+      <td>project</td>
+      <td>369</td>
+      <td>5246</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>framework</td>
+      <td>context</td>
+      <td>352</td>
+      <td>5246</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>framework</td>
+      <td>startup.py</td>
+      <td>156</td>
+      <td>5246</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>framework</td>
+      <td>__init__.py</td>
+      <td>1</td>
+      <td>5246</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>io</td>
+      <td>core.py</td>
+      <td>748</td>
+      <td>2284</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>io</td>
+      <td>data_catalog.py</td>
+      <td>594</td>
+      <td>2284</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>io</td>
+      <td>partitioned_dataset.py</td>
+      <td>551</td>
+      <td>2284</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>io</td>
+      <td>memory_dataset.py</td>
+      <td>132</td>
+      <td>2284</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>io</td>
+      <td>cached_dataset.py</td>
+      <td>113</td>
+      <td>2284</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>io</td>
+      <td>lambda_dataset.py</td>
+      <td>113</td>
+      <td>2284</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>io</td>
+      <td>__init__.py</td>
+      <td>33</td>
+      <td>2284</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>pipeline</td>
+      <td>pipeline.py</td>
+      <td>926</td>
+      <td>1837</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>pipeline</td>
+      <td>node.py</td>
+      <td>612</td>
+      <td>1837</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>pipeline</td>
+      <td>modular_pipeline.py</td>
+      <td>290</td>
+      <td>1837</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>pipeline</td>
+      <td>__init__.py</td>
+      <td>9</td>
+      <td>1837</td>
+    </tr>
+    <tr>
+      <th>30</th>
+      <td>runner</td>
+      <td>runner.py</td>
+      <td>456</td>
+      <td>1068</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>runner</td>
+      <td>parallel_runner.py</td>
+      <td>353</td>
+      <td>1068</td>
+    </tr>
+    <tr>
+      <th>32</th>
+      <td>runner</td>
+      <td>thread_runner.py</td>
+      <td>156</td>
+      <td>1068</td>
+    </tr>
+    <tr>
+      <th>31</th>
+      <td>runner</td>
+      <td>sequential_runner.py</td>
+      <td>87</td>
+      <td>1068</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>runner</td>
+      <td>__init__.py</td>
+      <td>16</td>
+      <td>1068</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>config</td>
+      <td>templated_config.py</td>
+      <td>281</td>
+      <td>721</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>config</td>
+      <td>common.py</td>
+      <td>248</td>
+      <td>721</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>config</td>
+      <td>config.py</td>
+      <td>134</td>
+      <td>721</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>config</td>
+      <td>abstract_config.py</td>
+      <td>39</td>
+      <td>721</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>config</td>
+      <td>__init__.py</td>
+      <td>19</td>
+      <td>721</td>
+    </tr>
+    <tr>
+      <th>34</th>
+      <td>templates</td>
+      <td>project</td>
+      <td>410</td>
+      <td>443</td>
+    </tr>
+    <tr>
+      <th>33</th>
+      <td>templates</td>
+      <td>pipeline</td>
+      <td>33</td>
+      <td>443</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>ipython</td>
+      <td>__init__.py</td>
+      <td>164</td>
+      <td>164</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell" data-vscode="{&quot;languageId&quot;:&quot;python&quot;}">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Total number of LOC</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>kedro_line_counts_df[<span class="st">"line_of_code"</span>].<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>18683</code></pre>
+</div>
+</div>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>The kedro codebase is not huge, roughly 20000 line of code, compare to pandas which has &gt; 250000 of code, 10x smaller. The <code>datasets</code> and <code>framework</code> code is the largest module which isn’t surprise to me. The more surprising is how small <code>config</code> actually is, but it creates huge complexity in terms of a kedro project. The <code>cli</code> is also relatively huge as it takes ~3000 lines of code which I didn’t expected.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
