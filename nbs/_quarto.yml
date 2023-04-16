@@ -6,16 +6,19 @@ format:
     theme: cosmo
     css: styles.css
     toc: true
+    toc-depth: 4
 
 website:
   twitter-card: true
   open-graph: true
   repo-actions: [issue]
   sidebar:
-    style: floating
-    contents:
-      # - auto: "/*.ipynb"
-      - blog/index.qmd
+      style: floating
+      contents:
+        # - auto: "/*.ipynb"
+        - text: "Blog"
+          href: blog/
+
 
   navbar:
     background: primary
@@ -25,6 +28,9 @@ website:
       # - about.qmd
       - text: "Blog"
         href: blog/index.qmd
+      - text: "Archive"
+        href: archive/index.qmd
+    right:
       - icon: github
         href: https://github.com/noklam
       - icon: twitter
@@ -33,4 +39,4 @@ website:
   google-analytics: UA-83544344-5
 
 
-metadata-files: [nbdev.yml, sidebar.yml]
+metadata-files: [nbdev.yml]

@@ -2,7 +2,7 @@ project:
   output-dir: _docs
 
 website:
-  title: "noklam.github.io"
+  title: "noklam"
   site-url: "https://noklam.github.io/noklam.github.io"
   description: "Quarto Blog"
   repo-branch: main
