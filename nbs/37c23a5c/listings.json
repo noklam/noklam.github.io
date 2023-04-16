@@ -1,0 +1,51 @@
+[
+  {
+    "listing": "/archive/posts/index.html",
+    "items": []
+  },
+  {
+    "listing": "/archive/index.html",
+    "items": [
+      "/archive/posts/index.html",
+      "/archive/posts/2022-11-08-kedro-debugging.html",
+      "/archive/posts/2022-07-11-europython2022-summary.html",
+      "/archive/posts/2022-05-30-mocking-with-pytest-patch.html",
+      "/archive/posts/2022-02-10-journey-of-understanding-python-and-programming-langauge.html",
+      "/archive/posts/2021-11-18-what-can-we-learn-from-shipping-crisis-as-a-data-scientist.html",
+      "/archive/posts/2021-08-18-python-file-not-found-long-file-path-window.html",
+      "/archive/posts/2021-07-10-5minutes-data-science-design-pattern-callback.html",
+      "/archive/posts/2021-06-20-logging-config-dict-issue-kedro.html",
+      "/archive/posts/2021-05-29-python-internal-series-python-gil-and-memory.html",
+      "/archive/posts/2021-04-16-full-stack-deep-learning-lecture-03.html",
+      "/archive/posts/2021-03-27-microsoft-azure-dp100.html",
+      "/archive/posts/2021-03-21-full-stack-deep-learning-lecture-01.html",
+      "/archive/posts/2021-03-17-pytest-data-test-truncated-error.html",
+      "/archive/posts/2020-12-10-typer-create-command-line-and-use-it-anywhere.html",
+      "/archive/posts/2020-11-10-pandas memory optimization.html",
+      "/archive/posts/2020-03-21-10-lessons-learnt-from-kaggle-competition.html",
+      "/archive/posts/2020-02-22-python-dynamic-dispatch.html",
+      "/archive/posts/2019-10-19-Deskto-Notification.html"
+    ]
+  },
+  {
+    "listing": "/blog/index.html",
+    "items": [
+      "/blog/posts/2023-04-12-Jupyter-Kernel/upyter-kernel-explained-chatgpt.html",
+      "/blog/posts/2022-11-16-python_single_dispatch/python-dispatch-typehint.html",
+      "/blog/posts/2022-11-15-kedro_duckdb/kedro-duckdb.html",
+      "/blog/posts/2022-11-13-pandas_expert/kedro-meta-analysis.html",
+      "/blog/posts/2022-11-10-python-expert/python-expert-decorator-generator-contextmanager.html",
+      "/blog/posts/kedro-debug-runner.html",
+      "/blog/posts/2021-07-02-kedro-datacatalog.html",
+      "/blog/posts/2021-06-26-jupyter-sql-notebook.html",
+      "/blog/posts/2021-03-19-deepcopy-lightgbm-and-🥒pickles.html",
+      "/blog/posts/2021-03-05-pyodbc-linux.html",
+      "/blog/posts/2020-12-04-kedro-pipeline.html",
+      "/blog/posts/2020-11-14-hong-kong-elevation-map-with-rayshader.html",
+      "/blog/posts/2020-04-13-recreating-the-bbc-graphs-in-python-plotnine-altair.html",
+      "/blog/posts/2020-04-10-presentation-ready-chart.html",
+      "/blog/posts/2020-02-09-MixUp-and-Beta-Distribution.html",
+      "/blog/posts/2020-02-08-Config-Composition-with-Hydra-for-Machine-Learning-Experiments.html"
+    ]
+  }
+]

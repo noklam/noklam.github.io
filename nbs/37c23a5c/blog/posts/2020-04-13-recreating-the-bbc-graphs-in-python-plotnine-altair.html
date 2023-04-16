@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2020-04-13">
+<meta name="description" content="Do you know that you can have ggplot in BBC R graphics cookbook? This is an attempt to reproduce https://bbc.github.io/rcookbook/ in python">
+
+<title>noklam - Recreating the BBC style graphic in Python - plotnine and altair</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-83544344-5', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="noklam - Recreating the BBC style graphic in Python - plotnine and altair">
+<meta property="og:description" content="Do you know that you can have `ggplot` in BBC R graphics cookbook? This is an attempt to reproduce https://bbc.github.io/rcookbook/ in python">
+<meta property="og:site-name" content="noklam">
+<meta name="twitter:title" content="noklam - Recreating the BBC style graphic in Python - plotnine and altair">
+<meta name="twitter:description" content="Do you know that you can have `ggplot` in BBC R graphics cookbook? This is an attempt to reproduce https://bbc.github.io/rcookbook/ in python">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">noklam</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog/index.html">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../archive/index.html">
+ <span class="menu-text">Archive</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/noklam"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Recreating the BBC style graphic in Python - <code>plotnine</code> and <code>altair</code></h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blog/" class="sidebar-item-text sidebar-link">Blog</a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#todo" id="toc-todo" class="nav-link active" data-scroll-target="#todo">Todo</a></li>
+  <li><a href="#difference-between-plotnine-and-ggplot" id="toc-difference-between-plotnine-and-ggplot" class="nav-link" data-scroll-target="#difference-between-plotnine-and-ggplot">Difference between plotnine and ggplot</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a>
+  <ul>
+  <li><a href="#plotnine-example" id="toc-plotnine-example" class="nav-link" data-scroll-target="#plotnine-example">Plotnine Example</a></li>
+  </ul></li>
+  <li><a href="#make-a-line-chart" id="toc-make-a-line-chart" class="nav-link" data-scroll-target="#make-a-line-chart">Make a Line Chart</a>
+  <ul>
+  <li><a href="#ggplot" id="toc-ggplot" class="nav-link" data-scroll-target="#ggplot">ggplot</a></li>
+  <li><a href="#plotnine" id="toc-plotnine" class="nav-link" data-scroll-target="#plotnine">plotnine</a></li>
+  </ul></li>
+  <li><a href="#the-bbc-style" id="toc-the-bbc-style" class="nav-link" data-scroll-target="#the-bbc-style">The BBC style</a>
+  <ul>
+  <li><a href="#altair" id="toc-altair" class="nav-link" data-scroll-target="#altair">altair</a></li>
+  </ul></li>
+  <li><a href="#make-a-multiple-line-chart" id="toc-make-a-multiple-line-chart" class="nav-link" data-scroll-target="#make-a-multiple-line-chart">Make a multiple line chart</a>
+  <ul>
+  <li><a href="#ggplot-1" id="toc-ggplot-1" class="nav-link" data-scroll-target="#ggplot-1">ggplot</a></li>
+  <li><a href="#plotnine-1" id="toc-plotnine-1" class="nav-link" data-scroll-target="#plotnine-1">plotnine</a></li>
+  <li><a href="#altair-1" id="toc-altair-1" class="nav-link" data-scroll-target="#altair-1">altair</a></li>
+  </ul></li>
+  <li><a href="#make-a-bar-chart" id="toc-make-a-bar-chart" class="nav-link" data-scroll-target="#make-a-bar-chart">Make a bar chart</a></li>
+  <li><a href="#ggplot-2" id="toc-ggplot-2" class="nav-link" data-scroll-target="#ggplot-2">ggplot</a>
+  <ul>
+  <li><a href="#plotnine-2" id="toc-plotnine-2" class="nav-link" data-scroll-target="#plotnine-2">plotnine</a></li>
+  <li><a href="#altair-2" id="toc-altair-2" class="nav-link" data-scroll-target="#altair-2">altair</a></li>
+  </ul></li>
+  <li><a href="#make-a-stacked-bar-chart" id="toc-make-a-stacked-bar-chart" class="nav-link" data-scroll-target="#make-a-stacked-bar-chart">Make a stacked bar chart</a>
+  <ul>
+  <li><a href="#data-preprocessing" id="toc-data-preprocessing" class="nav-link" data-scroll-target="#data-preprocessing">Data preprocessing</a></li>
+  <li><a href="#ggplot-3" id="toc-ggplot-3" class="nav-link" data-scroll-target="#ggplot-3">ggplot</a></li>
+  <li><a href="#plotnine-3" id="toc-plotnine-3" class="nav-link" data-scroll-target="#plotnine-3">plotnine</a></li>
+  <li><a href="#altair-3" id="toc-altair-3" class="nav-link" data-scroll-target="#altair-3">altair</a></li>
+  </ul></li>
+  <li><a href="#make-a-grouped-bar-chart" id="toc-make-a-grouped-bar-chart" class="nav-link" data-scroll-target="#make-a-grouped-bar-chart">Make a grouped bar chart</a>
+  <ul>
+  <li><a href="#ggplot-4" id="toc-ggplot-4" class="nav-link" data-scroll-target="#ggplot-4">ggplot</a></li>
+  <li><a href="#plotnine-4" id="toc-plotnine-4" class="nav-link" data-scroll-target="#plotnine-4">plotnine</a></li>
+  <li><a href="#altair-4" id="toc-altair-4" class="nav-link" data-scroll-target="#altair-4">altair</a></li>
+  </ul></li>
+  <li><a href="#make-changes-to-the-legend" id="toc-make-changes-to-the-legend" class="nav-link" data-scroll-target="#make-changes-to-the-legend">Make changes to the legend</a>
+  <ul>
+  <li><a href="#plotnine-5" id="toc-plotnine-5" class="nav-link" data-scroll-target="#plotnine-5">plotnine</a></li>
+  <li><a href="#altair-5" id="toc-altair-5" class="nav-link" data-scroll-target="#altair-5">altair</a></li>
+  </ul></li>
+  <li><a href="#make-changes-to-the-axes" id="toc-make-changes-to-the-axes" class="nav-link" data-scroll-target="#make-changes-to-the-axes">Make changes to the axes</a>
+  <ul>
+  <li><a href="#ggplot-5" id="toc-ggplot-5" class="nav-link" data-scroll-target="#ggplot-5">ggplot</a></li>
+  <li><a href="#plotnine-6" id="toc-plotnine-6" class="nav-link" data-scroll-target="#plotnine-6">plotnine</a></li>
+  <li><a href="#altair-6" id="toc-altair-6" class="nav-link" data-scroll-target="#altair-6">altair</a></li>
+  </ul></li>
+  <li><a href="#add-annotations" id="toc-add-annotations" class="nav-link" data-scroll-target="#add-annotations">Add annotations</a>
+  <ul>
+  <li><a href="#ggplot-6" id="toc-ggplot-6" class="nav-link" data-scroll-target="#ggplot-6">ggplot</a></li>
+  <li><a href="#plotnine-7" id="toc-plotnine-7" class="nav-link" data-scroll-target="#plotnine-7">plotnine</a></li>
+  <li><a href="#altair-7" id="toc-altair-7" class="nav-link" data-scroll-target="#altair-7">altair</a></li>
+  </ul></li>
+  <li><a href="#work-with-small-multiples" id="toc-work-with-small-multiples" class="nav-link" data-scroll-target="#work-with-small-multiples">Work with small multiples</a>
+  <ul>
+  <li><a href="#ggplot-7" id="toc-ggplot-7" class="nav-link" data-scroll-target="#ggplot-7">ggplot</a></li>
+  <li><a href="#plotnine-8" id="toc-plotnine-8" class="nav-link" data-scroll-target="#plotnine-8">plotnine</a></li>
+  <li><a href="#altair-8" id="toc-altair-8" class="nav-link" data-scroll-target="#altair-8">altair</a></li>
+  </ul></li>
+  <li><a href="#do-something-else-entirely" id="toc-do-something-else-entirely" class="nav-link" data-scroll-target="#do-something-else-entirely">Do something else entirely</a>
+  <ul>
+  <li><a href="#ggplot-8" id="toc-ggplot-8" class="nav-link" data-scroll-target="#ggplot-8">ggplot</a></li>
+  <li><a href="#plotnine-9" id="toc-plotnine-9" class="nav-link" data-scroll-target="#plotnine-9">plotnine</a></li>
+  <li><a href="#altair-9" id="toc-altair-9" class="nav-link" data-scroll-target="#altair-9">altair</a></li>
+  </ul></li>
+  <li><a href="#make-a-dumbbell-chart" id="toc-make-a-dumbbell-chart" class="nav-link" data-scroll-target="#make-a-dumbbell-chart">Make a dumbbell chart</a>
+  <ul>
+  <li><a href="#ggplot-9" id="toc-ggplot-9" class="nav-link" data-scroll-target="#ggplot-9">ggplot</a></li>
+  <li><a href="#plotnine-10" id="toc-plotnine-10" class="nav-link" data-scroll-target="#plotnine-10">plotnine</a></li>
+  <li><a href="#altair-10" id="toc-altair-10" class="nav-link" data-scroll-target="#altair-10">altair</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/noklam/noklam.github.io/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Recreating the BBC style graphic in Python - <code>plotnine</code> and <code>altair</code></h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">python</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    Do you know that you can have <code>ggplot</code> in BBC R graphics cookbook? This is an attempt to reproduce https://bbc.github.io/rcookbook/ in python
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">April 13, 2020</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="todo" class="level1">
+<h1>Todo</h1>
+<ul class="task-list">
+<li><input type="checkbox" disabled="">Missing Subtitle (plotnine)</li>
+<li><input type="checkbox" disabled="">Missing Style</li>
+</ul>
+</section>
+<section id="difference-between-plotnine-and-ggplot" class="level1">
+<h1>Difference between plotnine and ggplot</h1>
+<p>99% of them are the same, except that in python you have to wrap column names in <code>''</code>, otherwise it will be treated as variable and caused error. Most of the time you just need to wrap a <code>''</code> or replaced with <code>_</code> depends on the function.</p>
+<p>I tried to produce the same chart with <code>plotnine</code> and <code>altair</code>, and hopefully you will see their difference. <code>plotnine</code> covers 99% of <code>ggplot2</code>, so if you are coming from R, just go ahead with <code>plotnine</code>! <code>altair</code> is another interesting visualization library that base on vega-lite, therefore it can be integrated with website easily. In addition, it can also produce interactive chart with very simple function, which is a big plus!</p>
+</section>
+<section id="setup" class="level1">
+<h1>Setup</h1>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-21T09:47:27.079957Z&quot;,&quot;start_time&quot;:&quot;2020-04-21T09:47:04.195733Z&quot;}" data-execution_count="3">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># !pip install plotnine[all]</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># !pip install altair</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># !pip install gapminder</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> gapminder <span class="im">import</span> gapminder</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> plotnine.data <span class="im">import</span> mtcars</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> plotnine <span class="im">import</span> <span class="op">*</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> plotnine <span class="im">import</span> ggplot, geom_point, aes, stat_smooth, facet_wrap, geom_line</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> plotnine <span class="im">import</span> ggplot  <span class="co"># https://plotnine.readthedocs.io/en/stable/</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> altair <span class="im">as</span> alt</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> plotnine</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Collecting plotnine[all]
+  Using cached https://files.pythonhosted.org/packages/19/da/4d2f68e7436e76a3c26ccd804e1bfc5c58fca7a6cba06c71bab68b25e825/plotnine-0.6.0-py3-none-any.whl
+Collecting descartes&gt;=1.1.0 (from plotnine[all])
+  Using cached https://files.pythonhosted.org/packages/e5/b6/1ed2eb03989ae574584664985367ba70cd9cf8b32ee8cad0e8aaeac819f3/descartes-1.1.0-py3-none-any.whl
+Requirement already satisfied: numpy&gt;=1.16.0 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from plotnine[all]) (1.16.5)
+Requirement already satisfied: matplotlib&gt;=3.1.1 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from plotnine[all]) (3.1.1)
+Requirement already satisfied: statsmodels&gt;=0.9.0 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from plotnine[all]) (0.10.1)
+Requirement already satisfied: pandas&gt;=0.25.0 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from plotnine[all]) (1.0.3)
+Requirement already satisfied: scipy&gt;=1.2.0 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from plotnine[all]) (1.3.1)
+Requirement already satisfied: patsy&gt;=0.4.1 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from plotnine[all]) (0.5.1)
+Collecting mizani&gt;=0.6.0 (from plotnine[all])
+  Using cached https://files.pythonhosted.org/packages/e3/76/7a2c9094547ee592f9f43f651ab824aa6599af5e1456250c3f4cc162aece/mizani-0.6.0-py2.py3-none-any.whl
+Requirement already satisfied: scikit-learn; extra == "all" in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from plotnine[all]) (0.22.1)
+Collecting scikit-misc; extra == "all" (from plotnine[all])
+  Using cached https://files.pythonhosted.org/packages/94/4c/e6c3ba02dc66278317778b5c5df7b372c6c5313fce43615a7ce7fc0b34b8/scikit_misc-0.1.1-cp37-cp37m-win_amd64.whl
+Requirement already satisfied: cycler&gt;=0.10 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from matplotlib&gt;=3.1.1-&gt;plotnine[all]) (0.10.0)
+Requirement already satisfied: kiwisolver&gt;=1.0.1 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from matplotlib&gt;=3.1.1-&gt;plotnine[all]) (1.1.0)
+Requirement already satisfied: pyparsing!=2.0.4,!=2.1.2,!=2.1.6,&gt;=2.0.1 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from matplotlib&gt;=3.1.1-&gt;plotnine[all]) (2.4.2)
+Requirement already satisfied: python-dateutil&gt;=2.1 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from matplotlib&gt;=3.1.1-&gt;plotnine[all]) (2.8.0)
+Requirement already satisfied: pytz&gt;=2017.2 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from pandas&gt;=0.25.0-&gt;plotnine[all]) (2019.3)
+Requirement already satisfied: six in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from patsy&gt;=0.4.1-&gt;plotnine[all]) (1.12.0)
+Requirement already satisfied: palettable in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from mizani&gt;=0.6.0-&gt;plotnine[all]) (3.3.0)
+Requirement already satisfied: joblib&gt;=0.11 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from scikit-learn; extra == "all"-&gt;plotnine[all]) (0.13.2)
+Requirement already satisfied: setuptools in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from kiwisolver&gt;=1.0.1-&gt;matplotlib&gt;=3.1.1-&gt;plotnine[all]) (41.4.0)
+Installing collected packages: descartes, mizani, scikit-misc, plotnine
+Successfully installed descartes-1.1.0 mizani-0.6.0 plotnine-0.6.0 scikit-misc-0.1.1
+Requirement already satisfied: altair in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (4.1.0)
+Requirement already satisfied: jinja2 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from altair) (2.10.3)
+Requirement already satisfied: jsonschema in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from altair) (3.0.2)
+Requirement already satisfied: entrypoints in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from altair) (0.3)
+Requirement already satisfied: numpy in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from altair) (1.16.5)
+Requirement already satisfied: toolz in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from altair) (0.10.0)
+Requirement already satisfied: pandas&gt;=0.18 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from altair) (1.0.3)
+Requirement already satisfied: MarkupSafe&gt;=0.23 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from jinja2-&gt;altair) (1.1.1)
+Requirement already satisfied: pyrsistent&gt;=0.14.0 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from jsonschema-&gt;altair) (0.15.4)
+Requirement already satisfied: setuptools in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from jsonschema-&gt;altair) (41.4.0)
+Requirement already satisfied: six&gt;=1.11.0 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from jsonschema-&gt;altair) (1.12.0)
+Requirement already satisfied: attrs&gt;=17.4.0 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from jsonschema-&gt;altair) (19.2.0)
+Requirement already satisfied: pytz&gt;=2017.2 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from pandas&gt;=0.18-&gt;altair) (2019.3)
+Requirement already satisfied: python-dateutil&gt;=2.6.1 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from pandas&gt;=0.18-&gt;altair) (2.8.0)
+Collecting gapminder
+  Downloading https://files.pythonhosted.org/packages/85/83/57293b277ac2990ea1d3d0439183da8a3466be58174f822c69b02e584863/gapminder-0.1-py3-none-any.whl
+Requirement already satisfied: pandas in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from gapminder) (1.0.3)
+Requirement already satisfied: numpy&gt;=1.13.3 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from pandas-&gt;gapminder) (1.16.5)
+Requirement already satisfied: pytz&gt;=2017.2 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from pandas-&gt;gapminder) (2019.3)
+Requirement already satisfied: python-dateutil&gt;=2.6.1 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from pandas-&gt;gapminder) (2.8.0)
+Requirement already satisfied: six&gt;=1.5 in c:\users\channo.oocldm\appdata\local\continuum\anaconda3\lib\site-packages (from python-dateutil&gt;=2.6.1-&gt;pandas-&gt;gapminder) (1.12.0)
+Installing collected packages: gapminder
+Successfully installed gapminder-0.1</code></pre>
+</div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-21T09:47:27.085941Z&quot;,&quot;start_time&quot;:&quot;2020-04-21T09:47:27.081952Z&quot;}" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'altair version: </span><span class="sc">{</span>alt<span class="sc">.</span>__version__<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'plotnine version: </span><span class="sc">{</span>plotnine<span class="sc">.</span>__version__<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'pandas version: </span><span class="sc">{</span>pd<span class="sc">.</span>__version__<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>altair version: 4.1.0
+plotnine version: 0.6.0
+pandas version: 1.0.3</code></pre>
+</div>
+</div>
+<section id="plotnine-example" class="level2">
+<h2 class="anchored" data-anchor-id="plotnine-example">Plotnine Example</h2>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-21T09:47:27.843419Z&quot;,&quot;start_time&quot;:&quot;2020-04-21T09:47:27.087936Z&quot;}" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>(ggplot(mtcars, aes(<span class="st">'wt'</span>, <span class="st">'mpg'</span>, color<span class="op">=</span><span class="st">'factor(gear)'</span>))</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a> <span class="op">+</span> geom_point()</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a> <span class="op">+</span> stat_smooth(method<span class="op">=</span><span class="st">'lm'</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a> <span class="op">+</span> facet_wrap(<span class="st">'~gear'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-04-13-Recreating-the-BBC-graphs-in-Python-plotnine-altair_files/figure-html/cell-4-output-1.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>&lt;ggplot: (-9223371941312347920)&gt;</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="make-a-line-chart" class="level1">
+<h1>Make a Line Chart</h1>
+<section id="ggplot" class="level2">
+<h2 class="anchored" data-anchor-id="ggplot">ggplot</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>line_df <span class="ot">&lt;-</span> gapminder <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(country <span class="sc">==</span> <span class="st">"Malawi"</span>) </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Make plot</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>line <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(line_df, <span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> lifeExp)) <span class="sc">+</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">colour =</span> <span class="st">"#1380A1"</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">colour=</span><span class="st">"#333333"</span>) <span class="sc">+</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bbc_style</span>() <span class="sc">+</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">"Living longer"</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Life expectancy in Malawi 1952-2007"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="plotnine" class="level2">
+<h2 class="anchored" data-anchor-id="plotnine">plotnine</h2>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-21T09:47:30.149237Z&quot;,&quot;start_time&quot;:&quot;2020-04-21T09:47:29.807154Z&quot;}" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>(ggplot(line_df, aes(x<span class="op">=</span><span class="st">'year'</span>, y<span class="op">=</span><span class="st">'lifeExp'</span>)) <span class="op">+</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a> geom_line(colour<span class="op">=</span><span class="st">'#1380A1'</span>, size<span class="op">=</span><span class="dv">1</span>) <span class="op">+</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a> geom_hline(yintercept <span class="op">=</span> <span class="dv">0</span>, size <span class="op">=</span> <span class="dv">1</span>, colour<span class="op">=</span><span class="st">'#333333'</span>) <span class="op">+</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a> labs(title<span class="op">=</span><span class="st">'Living longer'</span>, </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>     subtitle <span class="op">=</span> <span class="st">'Life expectancy in Malawi 1952-2007'</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a> )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-04-13-Recreating-the-BBC-graphs-in-Python-plotnine-altair_files/figure-html/cell-6-output-1.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>&lt;ggplot: (-9223371941310406772)&gt;</code></pre>
+</div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-21T09:47:30.191125Z&quot;,&quot;start_time&quot;:&quot;2020-04-21T09:47:30.151232Z&quot;}" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">## altair</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>line <span class="op">=</span> (alt.Chart(line_df).mark_line().encode(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>x<span class="op">=</span><span class="st">'year'</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>y<span class="op">=</span><span class="st">'lifeExp'</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>.properties(title<span class="op">=</span>{<span class="st">'text'</span>: <span class="st">'Living Longer'</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                   <span class="st">'subtitle'</span>: <span class="st">'Life expectancy in Malawi 1952-2007'</span>})</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>) </span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co"># hline</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>overlay <span class="op">=</span> overlay <span class="op">=</span> pd.DataFrame({<span class="st">'y'</span>: [<span class="dv">0</span>]})</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>hline <span class="op">=</span> alt.Chart(overlay).mark_rule(color<span class="op">=</span><span class="st">'#333333'</span>, strokeWidth<span class="op">=</span><span class="dv">3</span>).encode(y<span class="op">=</span><span class="st">'y:Q'</span>)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>line <span class="op">+</span> hline</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+
+<div id="altair-viz-08ece90fee29424da66bd2467102af16"></div>
+<script type="text/javascript">
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-08ece90fee29424da66bd2467102af16") {
+      outputDiv = document.getElementById("altair-viz-08ece90fee29424da66bd2467102af16");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm//vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm//vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm//vega-lite@4.8.1?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm//vega-embed@6?noext",
+    };
+
+    function loadScript(lib) {
+      return new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = paths[lib];
+        s.async = true;
+        s.onload = () => resolve(paths[lib]);
+        s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+        document.getElementsByTagName("head")[0].appendChild(s);
+      });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else if (typeof vegaEmbed === "function") {
+      displayChart(vegaEmbed);
+    } else {
+      loadScript("vega")
+        .then(() => loadScript("vega-lite"))
+        .then(() => loadScript("vega-embed"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}}, "layer": [{"data": {"name": "data-09bd37ab7bcd5f13694b463cd22b382a"}, "mark": "line", "encoding": {"x": {"type": "quantitative", "field": "year"}, "y": {"type": "quantitative", "field": "lifeExp"}}, "title": {"text": "Living Longer", "subtitle": "Life expectancy in Malawi 1952-2007"}}, {"data": {"name": "data-06fd9f850666401b4599de5588b60692"}, "mark": {"type": "rule", "color": "#333333", "strokeWidth": 3}, "encoding": {"y": {"type": "quantitative", "field": "y"}}}], "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json", "datasets": {"data-09bd37ab7bcd5f13694b463cd22b382a": [{"country": "Malawi", "continent": "Africa", "year": 1952, "lifeExp": 36.256, "pop": 2917802, "gdpPercap": 369.1650802}, {"country": "Malawi", "continent": "Africa", "year": 1957, "lifeExp": 37.207, "pop": 3221238, "gdpPercap": 416.36980639999996}, {"country": "Malawi", "continent": "Africa", "year": 1962, "lifeExp": 38.41, "pop": 3628608, "gdpPercap": 427.90108560000004}, {"country": "Malawi", "continent": "Africa", "year": 1967, "lifeExp": 39.486999999999995, "pop": 4147252, "gdpPercap": 495.5147806}, {"country": "Malawi", "continent": "Africa", "year": 1972, "lifeExp": 41.766000000000005, "pop": 4730997, "gdpPercap": 584.6219709}, {"country": "Malawi", "continent": "Africa", "year": 1977, "lifeExp": 43.766999999999996, "pop": 5637246, "gdpPercap": 663.2236766}, {"country": "Malawi", "continent": "Africa", "year": 1982, "lifeExp": 45.641999999999996, "pop": 6502825, "gdpPercap": 632.8039209}, {"country": "Malawi", "continent": "Africa", "year": 1987, "lifeExp": 47.457, "pop": 7824747, "gdpPercap": 635.5173633999999}, {"country": "Malawi", "continent": "Africa", "year": 1992, "lifeExp": 49.42, "pop": 10014249, "gdpPercap": 563.2000145}, {"country": "Malawi", "continent": "Africa", "year": 1997, "lifeExp": 47.495, "pop": 10419991, "gdpPercap": 692.2758102999999}, {"country": "Malawi", "continent": "Africa", "year": 2002, "lifeExp": 45.00899999999999, "pop": 11824495, "gdpPercap": 665.4231186000001}, {"country": "Malawi", "continent": "Africa", "year": 2007, "lifeExp": 48.303000000000004, "pop": 13327079, "gdpPercap": 759.3499101}], "data-06fd9f850666401b4599de5588b60692": [{"y": 0}]}}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+</section>
+</section>
+<section id="the-bbc-style" class="level1">
+<h1>The BBC style</h1>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="cf">function</span> () </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    font <span class="ot">&lt;-</span> <span class="st">"Helvetica"</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">theme</span>(<span class="at">plot.title =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">family =</span> font, </span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">28</span>, <span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">color =</span> <span class="st">"#222222"</span>), <span class="at">plot.subtitle =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">family =</span> font, </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">22</span>, <span class="at">margin =</span> ggplot2<span class="sc">::</span><span class="fu">margin</span>(<span class="dv">9</span>, <span class="dv">0</span>, <span class="dv">9</span>, <span class="dv">0</span>)), <span class="at">plot.caption =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(), </span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"top"</span>, <span class="at">legend.text.align =</span> <span class="dv">0</span>, <span class="at">legend.background =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(), </span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(), <span class="at">legend.key =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(), </span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.text =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">family =</span> font, <span class="at">size =</span> <span class="dv">18</span>, </span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">color =</span> <span class="st">"#222222"</span>), <span class="at">axis.title =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(), </span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">family =</span> font, <span class="at">size =</span> <span class="dv">18</span>, </span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">color =</span> <span class="st">"#222222"</span>), <span class="at">axis.text.x =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">margin =</span> ggplot2<span class="sc">::</span><span class="fu">margin</span>(<span class="dv">5</span>, </span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">b =</span> <span class="dv">10</span>)), <span class="at">axis.ticks =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(), </span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.line =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(), <span class="at">panel.grid.minor =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(), </span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.y =</span> ggplot2<span class="sc">::</span><span class="fu">element_line</span>(<span class="at">color =</span> <span class="st">"#cbcbcb"</span>), </span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(), <span class="at">panel.background =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(), </span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.background =</span> ggplot2<span class="sc">::</span><span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"white"</span>), </span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.text =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">22</span>, <span class="at">hjust =</span> <span class="dv">0</span>))</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>    <span class="sc">&lt;</span>environment<span class="sc">:</span> namespace<span class="sc">:</span>bbplot<span class="sc">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-22T06:13:09.985650Z&quot;,&quot;start_time&quot;:&quot;2020-04-22T06:13:09.972686Z&quot;}" data-execution_count="54">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>legend_text_align</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<pre><code>NameError: name 'legend_text_align' is not defined</code></pre>
+</div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-22T06:36:56.051067Z&quot;,&quot;start_time&quot;:&quot;2020-04-22T06:36:56.044118Z&quot;}" data-execution_count="87">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> bbc_style():</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    font <span class="op">=</span> <span class="st">"Helvetica"</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    t <span class="op">=</span> theme(plot_title<span class="op">=</span>element_text(family<span class="op">=</span>font,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                                      size<span class="op">=</span><span class="dv">28</span>, face<span class="op">=</span><span class="st">"bold"</span>, color<span class="op">=</span><span class="st">"#222222"</span>),</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>              <span class="co">#       plot_subtitle=element_text(family=font,</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>              <span class="co">#                                  size=22, plot_margin=(9, 0, 9, 0)), plot_caption=element_blank(),</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>              legend_position<span class="op">=</span><span class="st">"top"</span>, legend_title_align<span class="op">=</span><span class="dv">0</span>, legend_background<span class="op">=</span>element_blank(),</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>              legend_title<span class="op">=</span>element_blank(), legend_key<span class="op">=</span>element_blank(),</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>              legend_text<span class="op">=</span>element_text(family<span class="op">=</span>font, size<span class="op">=</span><span class="dv">18</span>,</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>                                       color<span class="op">=</span><span class="st">"#222222"</span>), axis_title<span class="op">=</span>element_blank(),</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>              axis_text<span class="op">=</span>element_text(family<span class="op">=</span>font, size<span class="op">=</span><span class="dv">18</span>,</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>                                     color<span class="op">=</span><span class="st">"#222222"</span>),</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>              axis_text_x<span class="op">=</span>element_text(margin<span class="op">=</span>{<span class="st">'t'</span>: <span class="dv">5</span>, <span class="st">'b'</span>: <span class="dv">10</span>}),</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>              axis_ticks<span class="op">=</span>element_blank(),</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>              axis_line<span class="op">=</span>element_blank(), panel_grid_minor<span class="op">=</span>element_blank(),</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>              panel_grid_major_y<span class="op">=</span>element_line(color<span class="op">=</span><span class="st">"#cbcbcb"</span>),</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>              panel_grid_major_x<span class="op">=</span>element_blank(), panel_background<span class="op">=</span>element_blank(),</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>              strip_background<span class="op">=</span>element_rect(fill<span class="op">=</span><span class="st">"white"</span>),</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>              strip_text<span class="op">=</span>element_text(size<span class="op">=</span><span class="dv">22</span>, hjust<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>              )</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> t</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-22T06:37:11.757978Z&quot;,&quot;start_time&quot;:&quot;2020-04-22T06:37:11.749002Z&quot;}" data-execution_count="89">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>font <span class="op">=</span> <span class="st">"Helvetica"</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>theme(plot_title<span class="op">=</span>element_text(family<span class="op">=</span>font,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                                      size<span class="op">=</span><span class="dv">28</span>, face<span class="op">=</span><span class="st">"bold"</span>, color<span class="op">=</span><span class="st">"#222222"</span>),</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>              <span class="co">#       plot_subtitle=element_text(family=font,</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>              <span class="co">#                                  size=22, plot_margin=(9, 0, 9, 0)), plot_caption=element_blank(),</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>              legend_position<span class="op">=</span><span class="st">"top"</span>, legend_title_align<span class="op">=</span><span class="dv">0</span>, legend_background<span class="op">=</span>element_blank(),</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>              legend_title<span class="op">=</span>element_blank(), legend_key<span class="op">=</span>element_blank(),</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>              legend_text<span class="op">=</span>element_text(family<span class="op">=</span>font, size<span class="op">=</span><span class="dv">18</span>,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>                                       color<span class="op">=</span><span class="st">"#222222"</span>), axis_title<span class="op">=</span>element_blank(),</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>              axis_text<span class="op">=</span>element_text(family<span class="op">=</span>font, size<span class="op">=</span><span class="dv">18</span>,</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>                                     color<span class="op">=</span><span class="st">"#222222"</span>),</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>              axis_text_x<span class="op">=</span>element_text(margin<span class="op">=</span>{<span class="st">'t'</span>: <span class="dv">5</span>, <span class="st">'b'</span>: <span class="dv">10</span>}),</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>              axis_ticks<span class="op">=</span>element_blank(),</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>              axis_line<span class="op">=</span>element_blank(), panel_grid_minor<span class="op">=</span>element_blank(),</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>              panel_grid_major_y<span class="op">=</span>element_line(color<span class="op">=</span><span class="st">"#cbcbcb"</span>),</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>              panel_grid_major_x<span class="op">=</span>element_blank(), panel_background<span class="op">=</span>element_blank(),</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>              strip_background<span class="op">=</span>element_rect(fill<span class="op">=</span><span class="st">"white"</span>),</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>              strip_text<span class="op">=</span>element_text(size<span class="op">=</span><span class="dv">22</span>, hjust<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>              )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="89">
+<pre><code>&lt;plotnine.themes.theme.theme at 0x163f0ca1508&gt;</code></pre>
+</div>
+</div>
+<p>The <code>finalise_plot()</code> function does more than just save out your chart, it also left-aligns the title and subtitle as is standard for BBC graphics, adds a footer with the logo on the right side and lets you input source text on the left side.</p>
+<section id="altair" class="level2">
+<h2 class="anchored" data-anchor-id="altair">altair</h2>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-22T06:37:15.118084Z&quot;,&quot;start_time&quot;:&quot;2020-04-22T06:37:15.085171Z&quot;}" data-execution_count="90">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">## altair</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>line <span class="op">=</span> (alt.Chart(line_df).mark_line().encode(</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>x<span class="op">=</span><span class="st">'year'</span>,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>y<span class="op">=</span><span class="st">'lifeExp'</span>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>.properties(title<span class="op">=</span>{<span class="st">'text'</span>: <span class="st">'Living Longer'</span>,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>                   <span class="st">'subtitle'</span>: <span class="st">'Life expectancy in China 1952-2007'</span>})</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>) </span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co"># hline</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>overlay <span class="op">=</span> overlay <span class="op">=</span> pd.DataFrame({<span class="st">'lifeExp'</span>: [<span class="dv">0</span>]})</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>hline <span class="op">=</span> alt.Chart(overlay).mark_rule(color<span class="op">=</span><span class="st">'#333333'</span>, strokeWidth<span class="op">=</span><span class="dv">3</span>).encode(y<span class="op">=</span><span class="st">'lifeExp:Q'</span>)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>line <span class="op">+</span> hline</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="90">
+
+<div id="altair-viz-bd68f968dd334ec596e17d9d7c1f1359"></div>
+<script type="text/javascript">
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-bd68f968dd334ec596e17d9d7c1f1359") {
+      outputDiv = document.getElementById("altair-viz-bd68f968dd334ec596e17d9d7c1f1359");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm//vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm//vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm//vega-lite@4.8.1?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm//vega-embed@6?noext",
+    };
+
+    function loadScript(lib) {
+      return new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = paths[lib];
+        s.async = true;
+        s.onload = () => resolve(paths[lib]);
+        s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+        document.getElementsByTagName("head")[0].appendChild(s);
+      });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else if (typeof vegaEmbed === "function") {
+      displayChart(vegaEmbed);
+    } else {
+      loadScript("vega")
+        .then(() => loadScript("vega-lite"))
+        .then(() => loadScript("vega-embed"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}}, "layer": [{"data": {"name": "data-09bd37ab7bcd5f13694b463cd22b382a"}, "mark": "line", "encoding": {"x": {"type": "quantitative", "field": "year"}, "y": {"type": "quantitative", "field": "lifeExp"}}, "title": {"text": "Living Longer", "subtitle": "Life expectancy in China 1952-2007"}}, {"data": {"name": "data-b72d08f8e8aba7f4bc4f7a2761cca43e"}, "mark": {"type": "rule", "color": "#333333", "strokeWidth": 3}, "encoding": {"y": {"type": "quantitative", "field": "lifeExp"}}}], "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json", "datasets": {"data-09bd37ab7bcd5f13694b463cd22b382a": [{"country": "Malawi", "continent": "Africa", "year": 1952, "lifeExp": 36.256, "pop": 2917802, "gdpPercap": 369.1650802}, {"country": "Malawi", "continent": "Africa", "year": 1957, "lifeExp": 37.207, "pop": 3221238, "gdpPercap": 416.36980639999996}, {"country": "Malawi", "continent": "Africa", "year": 1962, "lifeExp": 38.41, "pop": 3628608, "gdpPercap": 427.90108560000004}, {"country": "Malawi", "continent": "Africa", "year": 1967, "lifeExp": 39.486999999999995, "pop": 4147252, "gdpPercap": 495.5147806}, {"country": "Malawi", "continent": "Africa", "year": 1972, "lifeExp": 41.766000000000005, "pop": 4730997, "gdpPercap": 584.6219709}, {"country": "Malawi", "continent": "Africa", "year": 1977, "lifeExp": 43.766999999999996, "pop": 5637246, "gdpPercap": 663.2236766}, {"country": "Malawi", "continent": "Africa", "year": 1982, "lifeExp": 45.641999999999996, "pop": 6502825, "gdpPercap": 632.8039209}, {"country": "Malawi", "continent": "Africa", "year": 1987, "lifeExp": 47.457, "pop": 7824747, "gdpPercap": 635.5173633999999}, {"country": "Malawi", "continent": "Africa", "year": 1992, "lifeExp": 49.42, "pop": 10014249, "gdpPercap": 563.2000145}, {"country": "Malawi", "continent": "Africa", "year": 1997, "lifeExp": 47.495, "pop": 10419991, "gdpPercap": 692.2758102999999}, {"country": "Malawi", "continent": "Africa", "year": 2002, "lifeExp": 45.00899999999999, "pop": 11824495, "gdpPercap": 665.4231186000001}, {"country": "Malawi", "continent": "Africa", "year": 2007, "lifeExp": 48.303000000000004, "pop": 13327079, "gdpPercap": 759.3499101}], "data-b72d08f8e8aba7f4bc4f7a2761cca43e": [{"lifeExp": 0}]}}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+</section>
+</section>
+<section id="make-a-multiple-line-chart" class="level1">
+<h1>Make a multiple line chart</h1>
+<section id="ggplot-1" class="level2">
+<h2 class="anchored" data-anchor-id="ggplot-1">ggplot</h2>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Prepare data</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>multiple_line_df <span class="ot">&lt;-</span> gapminder <span class="sc">%&gt;%</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(country <span class="sc">==</span> <span class="st">"China"</span> <span class="sc">|</span> country <span class="sc">==</span> <span class="st">"United States"</span>) </span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Make plot</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>multiple_line <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(multiple_line_df, <span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> lifeExp, <span class="at">colour =</span> country)) <span class="sc">+</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">colour=</span><span class="st">"#333333"</span>) <span class="sc">+</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#FAAB18"</span>, <span class="st">"#1380A1"</span>)) <span class="sc">+</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bbc_style</span>() <span class="sc">+</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">"Living longer"</span>,</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Life expectancy in China and the US"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="plotnine-1" class="level2">
+<h2 class="anchored" data-anchor-id="plotnine-1">plotnine</h2>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-22T06:37:17.502995Z&quot;,&quot;start_time&quot;:&quot;2020-04-22T06:37:17.167383Z&quot;}" data-execution_count="92">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Make plot</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>multiline <span class="op">=</span> (</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    ggplot(multiline_df, aes(x<span class="op">=</span><span class="st">'year'</span>, y<span class="op">=</span><span class="st">'lifeExp'</span>, colour<span class="op">=</span><span class="st">'country'</span>)) <span class="op">+</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    geom_line(colour<span class="op">=</span><span class="st">"#1380A1"</span>, size<span class="op">=</span><span class="dv">1</span>) <span class="op">+</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    geom_hline(yintercept<span class="op">=</span><span class="dv">0</span>, size<span class="op">=</span><span class="dv">1</span>, color<span class="op">=</span><span class="st">"#333333"</span>) <span class="op">+</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    scale_colour_manual(values<span class="op">=</span>[<span class="st">"#FAAB18"</span>, <span class="st">"#1380A1"</span>]) <span class="op">+</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>      bbc_style() <span class="op">+</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    labs(title<span class="op">=</span><span class="st">"Living longer"</span>,</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>         subtitle<span class="op">=</span><span class="st">"Life expectancy in China 1952-2007"</span>))</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>multiline</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>findfont: Font family ['Helvetica'] not found. Falling back to DejaVu Sans.
+findfont: Font family ['Helvetica'] not found. Falling back to DejaVu Sans.</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-04-13-Recreating-the-BBC-graphs-in-Python-plotnine-altair_files/figure-html/cell-14-output-2.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="92">
+<pre><code>&lt;ggplot: (-9223371941310014864)&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="altair-1" class="level2">
+<h2 class="anchored" data-anchor-id="altair-1">altair</h2>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-21T09:47:32.475002Z&quot;,&quot;start_time&quot;:&quot;2020-04-21T09:47:32.364299Z&quot;}" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>multiline_altair <span class="op">=</span> (alt.Chart(multiline_df).mark_line().encode(</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>x<span class="op">=</span><span class="st">'year'</span>,</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>y<span class="op">=</span><span class="st">'lifeExp'</span>,</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>color<span class="op">=</span><span class="st">'country'</span>)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>.properties(title<span class="op">=</span>{<span class="st">'text'</span>: <span class="st">'Living Longer'</span>,</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>                   <span class="st">'subtitle'</span>: <span class="st">'Life expectancy in China 1952-2007'</span>})</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>) </span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="co"># hline</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>overlay <span class="op">=</span> overlay <span class="op">=</span> pd.DataFrame({<span class="st">'lifeExp'</span>: [<span class="dv">0</span>]})</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>hline <span class="op">=</span> alt.Chart(overlay).mark_rule(color<span class="op">=</span><span class="st">'#333333'</span>, strokeWidth<span class="op">=</span><span class="dv">3</span>).encode(y<span class="op">=</span><span class="st">'lifeExp:Q'</span>)</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>multiline_altair <span class="op">+</span> hline</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+
+<div id="altair-viz-f99f481a2f53474fbadc4f79b22afc9f"></div>
+<script type="text/javascript">
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-f99f481a2f53474fbadc4f79b22afc9f") {
+      outputDiv = document.getElementById("altair-viz-f99f481a2f53474fbadc4f79b22afc9f");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm//vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm//vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm//vega-lite@4.8.1?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm//vega-embed@6?noext",
+    };
+
+    function loadScript(lib) {
+      return new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = paths[lib];
+        s.async = true;
+        s.onload = () => resolve(paths[lib]);
+        s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+        document.getElementsByTagName("head")[0].appendChild(s);
+      });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else if (typeof vegaEmbed === "function") {
+      displayChart(vegaEmbed);
+    } else {
+      loadScript("vega")
+        .then(() => loadScript("vega-lite"))
+        .then(() => loadScript("vega-embed"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}}, "layer": [{"data": {"name": "data-e288d201d411085ed0c88f3916d88499"}, "mark": "line", "encoding": {"color": {"type": "nominal", "field": "country"}, "x": {"type": "quantitative", "field": "year"}, "y": {"type": "quantitative", "field": "lifeExp"}}, "title": {"text": "Living Longer", "subtitle": "Life expectancy in China 1952-2007"}}, {"data": {"name": "data-b72d08f8e8aba7f4bc4f7a2761cca43e"}, "mark": {"type": "rule", "color": "#333333", "strokeWidth": 3}, "encoding": {"y": {"type": "quantitative", "field": "lifeExp"}}}], "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json", "datasets": {"data-e288d201d411085ed0c88f3916d88499": [{"country": "China", "continent": "Asia", "year": 1952, "lifeExp": 44.0, "pop": 556263527, "gdpPercap": 400.44861099999997}, {"country": "China", "continent": "Asia", "year": 1957, "lifeExp": 50.54896, "pop": 637408000, "gdpPercap": 575.9870009}, {"country": "China", "continent": "Asia", "year": 1962, "lifeExp": 44.50136, "pop": 665770000, "gdpPercap": 487.6740183}, {"country": "China", "continent": "Asia", "year": 1967, "lifeExp": 58.381119999999996, "pop": 754550000, "gdpPercap": 612.7056934}, {"country": "China", "continent": "Asia", "year": 1972, "lifeExp": 63.118880000000004, "pop": 862030000, "gdpPercap": 676.9000921}, {"country": "China", "continent": "Asia", "year": 1977, "lifeExp": 63.96736, "pop": 943455000, "gdpPercap": 741.2374699}, {"country": "China", "continent": "Asia", "year": 1982, "lifeExp": 65.525, "pop": 1000281000, "gdpPercap": 962.4213804999999}, {"country": "China", "continent": "Asia", "year": 1987, "lifeExp": 67.274, "pop": 1084035000, "gdpPercap": 1378.904018}, {"country": "China", "continent": "Asia", "year": 1992, "lifeExp": 68.69, "pop": 1164970000, "gdpPercap": 1655.784158}, {"country": "China", "continent": "Asia", "year": 1997, "lifeExp": 70.426, "pop": 1230075000, "gdpPercap": 2289.234136}, {"country": "China", "continent": "Asia", "year": 2002, "lifeExp": 72.028, "pop": 1280400000, "gdpPercap": 3119.280896}, {"country": "China", "continent": "Asia", "year": 2007, "lifeExp": 72.961, "pop": 1318683096, "gdpPercap": 4959.1148539999995}, {"country": "United States", "continent": "Americas", "year": 1952, "lifeExp": 68.44, "pop": 157553000, "gdpPercap": 13990.482080000002}, {"country": "United States", "continent": "Americas", "year": 1957, "lifeExp": 69.49, "pop": 171984000, "gdpPercap": 14847.12712}, {"country": "United States", "continent": "Americas", "year": 1962, "lifeExp": 70.21, "pop": 186538000, "gdpPercap": 16173.145859999999}, {"country": "United States", "continent": "Americas", "year": 1967, "lifeExp": 70.76, "pop": 198712000, "gdpPercap": 19530.365569999998}, {"country": "United States", "continent": "Americas", "year": 1972, "lifeExp": 71.34, "pop": 209896000, "gdpPercap": 21806.03594}, {"country": "United States", "continent": "Americas", "year": 1977, "lifeExp": 73.38, "pop": 220239000, "gdpPercap": 24072.63213}, {"country": "United States", "continent": "Americas", "year": 1982, "lifeExp": 74.65, "pop": 232187835, "gdpPercap": 25009.55914}, {"country": "United States", "continent": "Americas", "year": 1987, "lifeExp": 75.02, "pop": 242803533, "gdpPercap": 29884.350410000003}, {"country": "United States", "continent": "Americas", "year": 1992, "lifeExp": 76.09, "pop": 256894189, "gdpPercap": 32003.93224}, {"country": "United States", "continent": "Americas", "year": 1997, "lifeExp": 76.81, "pop": 272911760, "gdpPercap": 35767.43303}, {"country": "United States", "continent": "Americas", "year": 2002, "lifeExp": 77.31, "pop": 287675526, "gdpPercap": 39097.09955}, {"country": "United States", "continent": "Americas", "year": 2007, "lifeExp": 78.242, "pop": 301139947, "gdpPercap": 42951.65309}], "data-b72d08f8e8aba7f4bc4f7a2761cca43e": [{"lifeExp": 0}]}}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+</section>
+</section>
+<section id="make-a-bar-chart" class="level1">
+<h1>Make a bar chart</h1>
+</section>
+<section id="ggplot-2" class="level1">
+<h1>ggplot</h1>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Prepare data</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>bar_df <span class="ot">&lt;-</span> gapminder <span class="sc">%&gt;%</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2007</span> <span class="sc">&amp;</span> continent <span class="sc">==</span> <span class="st">"Africa"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(lifeExp)) <span class="sc">%&gt;%</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">5</span>)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Make plot</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>bars <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(bar_df, <span class="fu">aes</span>(<span class="at">x =</span> country, <span class="at">y =</span> lifeExp)) <span class="sc">+</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span><span class="st">"identity"</span>, </span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">position=</span><span class="st">"identity"</span>, </span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>           <span class="at">fill=</span><span class="st">"#1380A1"</span>) <span class="sc">+</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">colour=</span><span class="st">"#333333"</span>) <span class="sc">+</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bbc_style</span>() <span class="sc">+</span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">"Reunion is highest"</span>,</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Highest African life expectancy, 2007"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-21T09:47:32.968678Z&quot;,&quot;start_time&quot;:&quot;2020-04-21T09:47:32.959703Z&quot;}" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">## hide</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>bar_df <span class="op">=</span> gapminder.query(<span class="st">' year == 2007 &amp; continent == "Africa" '</span>).nlargest(<span class="dv">5</span>, <span class="st">'lifeExp'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="plotnine-2" class="level2">
+<h2 class="anchored" data-anchor-id="plotnine-2">plotnine</h2>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-21T09:47:33.564082Z&quot;,&quot;start_time&quot;:&quot;2020-04-21T09:47:33.337689Z&quot;}" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>bars_ggplot <span class="op">=</span> (ggplot(bar_df, aes(x<span class="op">=</span><span class="st">'country'</span>, y<span class="op">=</span><span class="st">'lifeExp'</span>)) <span class="op">+</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  geom_bar(stat<span class="op">=</span><span class="st">"identity"</span>,</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>           position<span class="op">=</span><span class="st">"identity"</span>,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>           fill<span class="op">=</span><span class="st">"#1380A1"</span>) <span class="op">+</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  geom_hline(yintercept<span class="op">=</span><span class="dv">0</span>, size<span class="op">=</span><span class="dv">1</span>, colour<span class="op">=</span><span class="st">"#333333"</span>) <span class="op">+</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   bbc_style() +</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  labs(title<span class="op">=</span><span class="st">"Reunion is highest"</span>,</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>       subtitle<span class="op">=</span><span class="st">"Highest African life expectancy, 2007"</span>))</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>bars_ggplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-04-13-Recreating-the-BBC-graphs-in-Python-plotnine-altair_files/figure-html/cell-17-output-1.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<pre><code>&lt;ggplot: (-9223371941310355340)&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="altair-2" class="level2">
+<h2 class="anchored" data-anchor-id="altair-2">altair</h2>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-21T09:47:33.738619Z&quot;,&quot;start_time&quot;:&quot;2020-04-21T09:47:33.714683Z&quot;}" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>bars_altair <span class="op">=</span> (alt.Chart(bar_df).mark_bar().encode(</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>x<span class="op">=</span><span class="st">'country'</span>,</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>y<span class="op">=</span><span class="st">'lifeExp'</span>,</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co"># color='country'</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>.properties(title<span class="op">=</span>{<span class="st">'text'</span>: <span class="st">'Reunion is highest'</span>,</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>                   <span class="st">'subtitle'</span>: <span class="st">'Highest African life expectancy, 2007'</span>})</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>) </span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>bars_altair</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+
+<div id="altair-viz-5dcd7b1199264c8794f7faa0c2a52471"></div>
+<script type="text/javascript">
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-5dcd7b1199264c8794f7faa0c2a52471") {
+      outputDiv = document.getElementById("altair-viz-5dcd7b1199264c8794f7faa0c2a52471");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm//vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm//vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm//vega-lite@4.8.1?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm//vega-embed@6?noext",
+    };
+
+    function loadScript(lib) {
+      return new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = paths[lib];
+        s.async = true;
+        s.onload = () => resolve(paths[lib]);
+        s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+        document.getElementsByTagName("head")[0].appendChild(s);
+      });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else if (typeof vegaEmbed === "function") {
+      displayChart(vegaEmbed);
+    } else {
+      loadScript("vega")
+        .then(() => loadScript("vega-lite"))
+        .then(() => loadScript("vega-embed"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}}, "data": {"name": "data-2c873659a10eb72379a7cf9f200ef3ca"}, "mark": "bar", "encoding": {"x": {"type": "nominal", "field": "country"}, "y": {"type": "quantitative", "field": "lifeExp"}}, "title": {"text": "Reunion is highest", "subtitle": "Highest African life expectancy, 2007"}, "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json", "datasets": {"data-2c873659a10eb72379a7cf9f200ef3ca": [{"country": "Reunion", "continent": "Africa", "year": 2007, "lifeExp": 76.442, "pop": 798094, "gdpPercap": 7670.122558}, {"country": "Libya", "continent": "Africa", "year": 2007, "lifeExp": 73.952, "pop": 6036914, "gdpPercap": 12057.49928}, {"country": "Tunisia", "continent": "Africa", "year": 2007, "lifeExp": 73.923, "pop": 10276158, "gdpPercap": 7092.923025}, {"country": "Mauritius", "continent": "Africa", "year": 2007, "lifeExp": 72.801, "pop": 1250882, "gdpPercap": 10956.99112}, {"country": "Algeria", "continent": "Africa", "year": 2007, "lifeExp": 72.301, "pop": 33333216, "gdpPercap": 6223.367465}]}}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+</section>
+</section>
+<section id="make-a-stacked-bar-chart" class="level1">
+<h1>Make a stacked bar chart</h1>
+<section id="data-preprocessing" class="level2">
+<h2 class="anchored" data-anchor-id="data-preprocessing">Data preprocessing</h2>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-21T09:47:34.356962Z&quot;,&quot;start_time&quot;:&quot;2020-04-21T09:47:34.323053Z&quot;}" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">## collapse-hide</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>stacked_bar_df <span class="op">=</span> (</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    gapminder.query(<span class="st">' year == 2007'</span>)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    .assign(</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>        lifeExpGrouped<span class="op">=</span><span class="kw">lambda</span> x: pd.cut(</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>            x[<span class="st">'lifeExp'</span>],</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>            bins<span class="op">=</span>[<span class="dv">0</span>, <span class="dv">50</span>, <span class="dv">65</span>, <span class="dv">80</span>, <span class="dv">90</span>],</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>            labels<span class="op">=</span>[<span class="st">"under 50"</span>, <span class="st">"50-65"</span>, <span class="st">"65-80"</span>, <span class="st">"80+"</span>]))</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    .groupby(</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>        [<span class="st">'continent'</span>, <span class="st">'lifeExpGrouped'</span>], as_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    .agg({<span class="st">'pop'</span>: <span class="st">'sum'</span>})</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>    .rename(columns<span class="op">=</span>{<span class="st">'pop'</span>: <span class="st">'continentPop'</span>})</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>    .reset_index()</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>stacked_bar_df[<span class="st">'lifeExpGrouped'</span>] <span class="op">=</span> pd.Categorical(stacked_bar_df[<span class="st">'lifeExpGrouped'</span>], ordered<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>stacked_bar_df.head(<span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>continent</th>
+      <th>lifeExpGrouped</th>
+      <th>continentPop</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Africa</td>
+      <td>under 50</td>
+      <td>376100713.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Africa</td>
+      <td>50-65</td>
+      <td>386811458.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Africa</td>
+      <td>65-80</td>
+      <td>166627521.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Africa</td>
+      <td>80+</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Americas</td>
+      <td>under 50</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Americas</td>
+      <td>50-65</td>
+      <td>8502814.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="ggplot-3" class="level2">
+<h2 class="anchored" data-anchor-id="ggplot-3">ggplot</h2>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">#prepare data</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>stacked_df <span class="ot">&lt;-</span> gapminder <span class="sc">%&gt;%</span> </span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2007</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">lifeExpGrouped =</span> <span class="fu">cut</span>(lifeExp, </span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">50</span>, <span class="dv">65</span>, <span class="dv">80</span>, <span class="dv">90</span>),</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Under 50"</span>, <span class="st">"50-65"</span>, <span class="st">"65-80"</span>, <span class="st">"80+"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(continent, lifeExpGrouped) <span class="sc">%&gt;%</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">continentPop =</span> <span class="fu">sum</span>(<span class="fu">as.numeric</span>(pop)))</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="co">#set order of stacks by changing factor levels</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>stacked_df<span class="sc">$</span>lifeExpGrouped <span class="ot">=</span> <span class="fu">factor</span>(stacked_df<span class="sc">$</span>lifeExpGrouped, <span class="at">levels =</span> <span class="fu">rev</span>(<span class="fu">levels</span>(stacked_df<span class="sc">$</span>lifeExpGrouped)))</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a><span class="co">#create plot</span></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>stacked_bars <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data =</span> stacked_df, </span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">aes</span>(<span class="at">x =</span> continent,</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>                           <span class="at">y =</span> continentPop,</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>                           <span class="at">fill =</span> lifeExpGrouped)) <span class="sc">+</span></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, </span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>           <span class="at">position =</span> <span class="st">"fill"</span>) <span class="sc">+</span></span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bbc_style</span>() <span class="sc">+</span></span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span>percent) <span class="sc">+</span></span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_d</span>(<span class="at">direction =</span> <span class="sc">-</span><span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">colour =</span> <span class="st">"#333333"</span>) <span class="sc">+</span></span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"How life expectancy varies"</span>,</span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"% of population by life expectancy band, 2007"</span>) <span class="sc">+</span></span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>, </span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.justification =</span> <span class="st">"left"</span>) <span class="sc">+</span></span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">fill =</span> <span class="fu">guide_legend</span>(<span class="at">reverse =</span> <span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="plotnine-3" class="level2">
+<h2 class="anchored" data-anchor-id="plotnine-3">plotnine</h2>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-21T09:47:38.515855Z&quot;,&quot;start_time&quot;:&quot;2020-04-21T09:47:38.204690Z&quot;}" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create plot</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>stacked_bar_ggplot <span class="op">=</span> (</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    ggplot(stacked_bar_df,</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>           aes(x<span class="op">=</span><span class="st">'continent'</span>,</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>               y<span class="op">=</span><span class="st">'continentPop'</span>,</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>               fill<span class="op">=</span><span class="st">'lifeExpGrouped'</span>)</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>           ) <span class="op">+</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    geom_bar(stat<span class="op">=</span><span class="st">"identity"</span>,</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>             position<span class="op">=</span><span class="st">"fill"</span>) <span class="op">+</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   bbc_style() +</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>    scale_y_continuous(labels<span class="op">=</span><span class="kw">lambda</span> l: [<span class="st">"</span><span class="sc">%d%%</span><span class="st">"</span> <span class="op">%</span> (v <span class="op">*</span> <span class="dv">100</span>) <span class="cf">for</span> v <span class="kw">in</span> l]) <span class="op">+</span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>    scale_fill_cmap_d(direction<span class="op">=-</span><span class="dv">1</span>) <span class="op">+</span>  <span class="co"># scale_fill_viridis_d</span></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>    geom_hline(yintercept<span class="op">=</span><span class="dv">0</span>, size<span class="op">=</span><span class="dv">1</span>, colour<span class="op">=</span><span class="st">"#333333"</span>) <span class="op">+</span></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>    labs(title<span class="op">=</span><span class="st">"How life expectancy varies"</span>,</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>         subtitle<span class="op">=</span><span class="st">"</span><span class="sc">% o</span><span class="st">f population by life expectancy band, 2007"</span>) <span class="op">+</span></span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>    guides(fill<span class="op">=</span>guide_legend(reverse<span class="op">=</span><span class="va">True</span>)))</span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>stacked_bar_ggplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>C:\Users\CHANNO.OOCLDM\AppData\Local\Continuum\anaconda3\lib\site-packages\plotnine\scales\scale.py:91: PlotnineWarning: scale_fill_cmap_d could not recognise parameter `direction`
+  warn(msg.format(self.__class__.__name__, k), PlotnineWarning)
+C:\Users\CHANNO.OOCLDM\AppData\Local\Continuum\anaconda3\lib\site-packages\plotnine\layer.py:433: PlotnineWarning: position_stack : Removed 7 rows containing missing values.
+  data = self.position.setup_data(self.data, params)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-04-13-Recreating-the-BBC-graphs-in-Python-plotnine-altair_files/figure-html/cell-20-output-2.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<pre><code>&lt;ggplot: (-9223371941310320660)&gt;</code></pre>
+</div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-21T09:47:38.869906Z&quot;,&quot;start_time&quot;:&quot;2020-04-21T09:47:38.517898Z&quot;}" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create plot</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>stacked_bar_ggplot <span class="op">=</span> (</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    ggplot(stacked_bar_df,</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>           aes(x<span class="op">=</span><span class="st">'continent'</span>,</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>               y<span class="op">=</span><span class="st">'continentPop'</span>,</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>               fill<span class="op">=</span><span class="st">'lifeExpGrouped'</span>)</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>           ) <span class="op">+</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>    geom_bar(stat<span class="op">=</span><span class="st">"identity"</span>,</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>             position<span class="op">=</span><span class="st">"fill"</span>) <span class="op">+</span></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   bbc_style() +</span></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>    scale_y_continuous(labels<span class="op">=</span><span class="kw">lambda</span> l: [<span class="st">"</span><span class="sc">%d%%</span><span class="st">"</span> <span class="op">%</span> (v <span class="op">*</span> <span class="dv">100</span>) <span class="cf">for</span> v <span class="kw">in</span> l]) <span class="op">+</span></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>    scale_fill_cmap_d(direction<span class="op">=-</span><span class="dv">1</span>) <span class="op">+</span>  <span class="co"># scale_fill_viridis_d</span></span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>    geom_hline(yintercept<span class="op">=</span><span class="dv">0</span>, size<span class="op">=</span><span class="dv">1</span>, colour<span class="op">=</span><span class="st">"#333333"</span>) <span class="op">+</span></span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>    labs(title<span class="op">=</span><span class="st">"How life expectancy varies"</span>,</span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>         subtitle<span class="op">=</span><span class="st">"</span><span class="sc">% o</span><span class="st">f population by life expectancy band, 2007"</span>) <span class="op">+</span></span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>    guides(fill<span class="op">=</span>guide_legend(reverse<span class="op">=</span><span class="va">True</span>)))</span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a>stacked_bar_ggplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>C:\Users\CHANNO.OOCLDM\AppData\Local\Continuum\anaconda3\lib\site-packages\plotnine\scales\scale.py:91: PlotnineWarning: scale_fill_cmap_d could not recognise parameter `direction`
+  warn(msg.format(self.__class__.__name__, k), PlotnineWarning)
+C:\Users\CHANNO.OOCLDM\AppData\Local\Continuum\anaconda3\lib\site-packages\plotnine\layer.py:433: PlotnineWarning: position_stack : Removed 7 rows containing missing values.
+  data = self.position.setup_data(self.data, params)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-04-13-Recreating-the-BBC-graphs-in-Python-plotnine-altair_files/figure-html/cell-21-output-2.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<pre><code>&lt;ggplot: (-9223371941310406808)&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="altair-3" class="level2">
+<h2 class="anchored" data-anchor-id="altair-3">altair</h2>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-21T09:47:38.900824Z&quot;,&quot;start_time&quot;:&quot;2020-04-21T09:47:38.870903Z&quot;}" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>stacked_bar_altair <span class="op">=</span> (</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    alt.Chart(stacked_bar_df)</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    .mark_bar()</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    .encode(x<span class="op">=</span><span class="st">'continent'</span>,</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>            y<span class="op">=</span>alt.Y(<span class="st">'continentPop'</span>, stack<span class="op">=</span><span class="st">'normalize'</span>,</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>                    axis<span class="op">=</span>alt.Axis(<span class="bu">format</span><span class="op">=</span><span class="st">'%'</span>)),</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>            fill<span class="op">=</span>alt.Fill(<span class="st">'lifeExpGrouped'</span>, scale<span class="op">=</span>alt.Scale(scheme<span class="op">=</span><span class="st">'viridis'</span>)))</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>    .properties(title<span class="op">=</span>{<span class="st">'text'</span>: <span class="st">'How life expectancy varies'</span>,</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>                       <span class="st">'subtitle'</span>: <span class="st">'</span><span class="sc">% o</span><span class="st">f population by life expectancy band, 2007'</span>}</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>overlay <span class="op">=</span> overlay <span class="op">=</span> pd.DataFrame({<span class="st">'continentPop'</span>: [<span class="dv">0</span>]})</span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>hline <span class="op">=</span> alt.Chart(overlay).mark_rule(</span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">'#333333'</span>, strokeWidth<span class="op">=</span><span class="dv">2</span>).encode(y<span class="op">=</span><span class="st">'continentPop:Q'</span>)</span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>stacked_bar_altair <span class="op">+</span> hline</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+
+<div id="altair-viz-dfba4f1dcf31401d825b0c1c0d5d2edf"></div>
+<script type="text/javascript">
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-dfba4f1dcf31401d825b0c1c0d5d2edf") {
+      outputDiv = document.getElementById("altair-viz-dfba4f1dcf31401d825b0c1c0d5d2edf");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm//vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm//vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm//vega-lite@4.8.1?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm//vega-embed@6?noext",
+    };
+
+    function loadScript(lib) {
+      return new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = paths[lib];
+        s.async = true;
+        s.onload = () => resolve(paths[lib]);
+        s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+        document.getElementsByTagName("head")[0].appendChild(s);
+      });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else if (typeof vegaEmbed === "function") {
+      displayChart(vegaEmbed);
+    } else {
+      loadScript("vega")
+        .then(() => loadScript("vega-lite"))
+        .then(() => loadScript("vega-embed"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}}, "layer": [{"data": {"name": "data-144d424e1e9fff33be59e9736a4970cd"}, "mark": "bar", "encoding": {"fill": {"type": "nominal", "field": "lifeExpGrouped", "scale": {"scheme": "viridis"}}, "x": {"type": "nominal", "field": "continent"}, "y": {"type": "quantitative", "axis": {"format": "%"}, "field": "continentPop", "stack": "normalize"}}, "title": {"text": "How life expectancy varies", "subtitle": "% of population by life expectancy band, 2007"}}, {"data": {"name": "data-d45d92cd6de2edfd11b04060325cd948"}, "mark": {"type": "rule", "color": "#333333", "strokeWidth": 2}, "encoding": {"y": {"type": "quantitative", "field": "continentPop"}}}], "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json", "datasets": {"data-144d424e1e9fff33be59e9736a4970cd": [{"continent": "Africa", "lifeExpGrouped": "under 50", "continentPop": 376100713.0}, {"continent": "Africa", "lifeExpGrouped": "50-65", "continentPop": 386811458.0}, {"continent": "Africa", "lifeExpGrouped": "65-80", "continentPop": 166627521.0}, {"continent": "Africa", "lifeExpGrouped": "80+", "continentPop": null}, {"continent": "Americas", "lifeExpGrouped": "under 50", "continentPop": null}, {"continent": "Americas", "lifeExpGrouped": "50-65", "continentPop": 8502814.0}, {"continent": "Americas", "lifeExpGrouped": "65-80", "continentPop": 856978229.0}, {"continent": "Americas", "lifeExpGrouped": "80+", "continentPop": 33390141.0}, {"continent": "Asia", "lifeExpGrouped": "under 50", "continentPop": 31889923.0}, {"continent": "Asia", "lifeExpGrouped": "50-65", "continentPop": 1401351679.0}, {"continent": "Asia", "lifeExpGrouped": "65-80", "continentPop": 2237837162.0}, {"continent": "Asia", "lifeExpGrouped": "80+", "continentPop": 140875063.0}, {"continent": "Europe", "lifeExpGrouped": "under 50", "continentPop": null}, {"continent": "Europe", "lifeExpGrouped": "50-65", "continentPop": null}, {"continent": "Europe", "lifeExpGrouped": "65-80", "continentPop": 404903083.0}, {"continent": "Europe", "lifeExpGrouped": "80+", "continentPop": 181195446.0}, {"continent": "Oceania", "lifeExpGrouped": "under 50", "continentPop": null}, {"continent": "Oceania", "lifeExpGrouped": "50-65", "continentPop": null}, {"continent": "Oceania", "lifeExpGrouped": "65-80", "continentPop": null}, {"continent": "Oceania", "lifeExpGrouped": "80+", "continentPop": 24549947.0}], "data-d45d92cd6de2edfd11b04060325cd948": [{"continentPop": 0}]}}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+</section>
+</section>
+<section id="make-a-grouped-bar-chart" class="level1">
+<h1>Make a grouped bar chart</h1>
+<section id="ggplot-4" class="level2">
+<h2 class="anchored" data-anchor-id="ggplot-4">ggplot</h2>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Prepare data</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>grouped_bar_df <span class="ot">&lt;-</span> gapminder <span class="sc">%&gt;%</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">1967</span> <span class="sc">|</span> year <span class="sc">==</span> <span class="dv">2007</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(country, year, lifeExp) <span class="sc">%&gt;%</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">spread</span>(year, lifeExp) <span class="sc">%&gt;%</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gap =</span> <span class="st">`</span><span class="at">2007</span><span class="st">`</span> <span class="sc">-</span> <span class="st">`</span><span class="at">1967</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(gap)) <span class="sc">%&gt;%</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(<span class="at">key =</span> year, </span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">value =</span> lifeExp,</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span>country,</span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span>gap) </span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a><span class="co">#Make plot</span></span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>grouped_bars <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(grouped_bar_df, </span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">aes</span>(<span class="at">x =</span> country, </span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>                           <span class="at">y =</span> lifeExp, </span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>                           <span class="at">fill =</span> <span class="fu">as.factor</span>(year))) <span class="sc">+</span></span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span><span class="st">"identity"</span>, <span class="at">position=</span><span class="st">"dodge"</span>) <span class="sc">+</span></span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">colour=</span><span class="st">"#333333"</span>) <span class="sc">+</span></span>
+<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bbc_style</span>() <span class="sc">+</span></span>
+<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#1380A1"</span>, <span class="st">"#FAAB18"</span>)) <span class="sc">+</span></span>
+<span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">"We're living longer"</span>,</span>
+<span id="cb37-24"><a href="#cb37-24" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Biggest life expectancy rise, 1967-2007"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="plotnine-4" class="level2">
+<h2 class="anchored" data-anchor-id="plotnine-4">plotnine</h2>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-21T09:47:40.739893Z&quot;,&quot;start_time&quot;:&quot;2020-04-21T09:47:40.458648Z&quot;}" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Make plot</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>grouped_bars_ggplot <span class="op">=</span> (ggplot(grouped_bar_df,</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>                       aes(x<span class="op">=</span><span class="st">'country'</span>,</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>                           y<span class="op">=</span><span class="st">'lifeExp'</span>,</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>                           fill<span class="op">=</span><span class="st">'year'</span>)) <span class="op">+</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>                geom_bar(stat<span class="op">=</span><span class="st">"identity"</span>, position<span class="op">=</span><span class="st">"dodge"</span>) <span class="op">+</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>                geom_hline(yintercept<span class="op">=</span><span class="dv">0</span>, size<span class="op">=</span><span class="dv">1</span>, colour<span class="op">=</span><span class="st">"#333333"</span>) <span class="op">+</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a><span class="co">#                 bbc_style() +</span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>                scale_fill_manual(values<span class="op">=</span>(<span class="st">"#1380A1"</span>, <span class="st">"#FAAB18"</span>)) <span class="op">+</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>                labs(title<span class="op">=</span><span class="st">"We're living longer"</span>,</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>                     subtitle<span class="op">=</span><span class="st">"Biggest life expectancy rise, 1967-2007"</span>))</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>grouped_bars_ggplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-04-13-Recreating-the-BBC-graphs-in-Python-plotnine-altair_files/figure-html/cell-24-output-1.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<pre><code>&lt;ggplot: (-9223371941310352504)&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="altair-4" class="level2">
+<h2 class="anchored" data-anchor-id="altair-4">altair</h2>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-21T09:47:41.203650Z&quot;,&quot;start_time&quot;:&quot;2020-04-21T09:47:41.180711Z&quot;}" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>grouped_bars_altair <span class="op">=</span> (</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>    alt.Chart(grouped_bar_df)</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    .mark_bar()</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    .encode(x<span class="op">=</span><span class="st">'year:N'</span>,</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>            y<span class="op">=</span><span class="st">'lifeExp'</span>,</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>color<span class="op">=</span>alt.Color(<span class="st">'year:N'</span>, scale<span class="op">=</span>alt.Scale(<span class="bu">range</span><span class="op">=</span>[<span class="st">"#1380A1"</span>, <span class="st">"#FAAB18"</span>])),</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>           column<span class="op">=</span><span class="st">'country:N'</span>)</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>    .properties(title<span class="op">=</span>{<span class="st">'text'</span>: <span class="st">"We're living longe"</span>,</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>                       <span class="st">'subtitle'</span>: <span class="st">'Biggest life expectancy rise, 1967-2007'</span>}</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>grouped_bars_altair</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="22">
+
+<div id="altair-viz-529c3d6b33d24d93bd75a5a9cf89b58d"></div>
+<script type="text/javascript">
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-529c3d6b33d24d93bd75a5a9cf89b58d") {
+      outputDiv = document.getElementById("altair-viz-529c3d6b33d24d93bd75a5a9cf89b58d");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm//vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm//vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm//vega-lite@4.8.1?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm//vega-embed@6?noext",
+    };
+
+    function loadScript(lib) {
+      return new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = paths[lib];
+        s.async = true;
+        s.onload = () => resolve(paths[lib]);
+        s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+        document.getElementsByTagName("head")[0].appendChild(s);
+      });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else if (typeof vegaEmbed === "function") {
+      displayChart(vegaEmbed);
+    } else {
+      loadScript("vega")
+        .then(() => loadScript("vega-lite"))
+        .then(() => loadScript("vega-embed"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}}, "data": {"name": "data-23e0747d191a42a58e9c5764138c1bc9"}, "mark": "bar", "encoding": {"color": {"type": "nominal", "field": "year", "scale": {"range": ["#1380A1", "#FAAB18"]}}, "column": {"type": "nominal", "field": "country"}, "x": {"type": "nominal", "field": "year"}, "y": {"type": "quantitative", "field": "lifeExp"}}, "title": {"text": "We're living longe", "subtitle": "Biggest life expectancy rise, 1967-2007"}, "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json", "datasets": {"data-23e0747d191a42a58e9c5764138c1bc9": [{"country": "Oman", "gap": 28.652, "year": 1967, "lifeExp": 46.988}, {"country": "Vietnam", "gap": 26.410999999999994, "year": 1967, "lifeExp": 47.838}, {"country": "Yemen, Rep.", "gap": 25.714, "year": 1967, "lifeExp": 36.984}, {"country": "Indonesia", "gap": 24.686000000000007, "year": 1967, "lifeExp": 45.964}, {"country": "Libya", "gap": 23.725, "year": 1967, "lifeExp": 50.227}, {"country": "Oman", "gap": 28.652, "year": 2007, "lifeExp": 75.64}, {"country": "Vietnam", "gap": 26.410999999999994, "year": 2007, "lifeExp": 74.249}, {"country": "Yemen, Rep.", "gap": 25.714, "year": 2007, "lifeExp": 62.698}, {"country": "Indonesia", "gap": 24.686000000000007, "year": 2007, "lifeExp": 70.65}, {"country": "Libya", "gap": 23.725, "year": 2007, "lifeExp": 73.952}]}}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+</section>
+</section>
+<section id="make-changes-to-the-legend" class="level1">
+<h1>Make changes to the legend</h1>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-21T09:47:41.907762Z&quot;,&quot;start_time&quot;:&quot;2020-04-21T09:47:41.903773Z&quot;}" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co">## hide</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="plotnine-5" class="level2">
+<h2 class="anchored" data-anchor-id="plotnine-5">plotnine</h2>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-21T09:49:11.071229Z&quot;,&quot;start_time&quot;:&quot;2020-04-21T09:49:10.795949Z&quot;}" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove the Legend</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>multiline <span class="op">+</span> guides(colour<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-04-13-Recreating-the-BBC-graphs-in-Python-plotnine-altair_files/figure-html/cell-27-output-1.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="28">
+<pre><code>&lt;ggplot: (-9223371941310211164)&gt;</code></pre>
+</div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-21T09:51:28.929953Z&quot;,&quot;start_time&quot;:&quot;2020-04-21T09:51:28.648708Z&quot;}" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>multiline <span class="op">+</span> theme(legend_position <span class="op">=</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-04-13-Recreating-the-BBC-graphs-in-Python-plotnine-altair_files/figure-html/cell-28-output-1.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="33">
+<pre><code>&lt;ggplot: (-9223371941308840576)&gt;</code></pre>
+</div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-22T06:02:24.449547Z&quot;,&quot;start_time&quot;:&quot;2020-04-22T06:02:24.434586Z&quot;}" data-execution_count="43">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> plotnine <span class="im">import</span> unit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<pre><code>ImportError: cannot import name 'unit' from 'plotnine' (C:\Users\CHANNO.OOCLDM\AppData\Local\Continuum\anaconda3\lib\site-packages\plotnine\__init__.py)</code></pre>
+</div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2020-04-22T06:05:50.146757Z&quot;,&quot;start_time&quot;:&quot;2020-04-22T06:05:49.876480Z&quot;}" data-execution_count="51">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Change position of the legend</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>x<span class="op">=</span>multiline <span class="op">+</span> theme(</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  axis_ticks_major_x <span class="op">=</span> element_line(color <span class="op">=</span> <span class="st">"#333333"</span>), </span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>  axis_ticks_length <span class="op">=</span>  <span class="fl">0.26</span>)</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-04-13-Recreating-the-BBC-graphs-in-Python-plotnine-altair_files/figure-html/cell-30-output-1.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="51">
+<pre><code>&lt;ggplot: (-9223371941310025320)&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="altair-5" class="level2">
+<h2 class="anchored" data-anchor-id="altair-5">altair</h2>
+</section>
+</section>
+<section id="make-changes-to-the-axes" class="level1">
+<h1>Make changes to the axes</h1>
+<div class="cell" data-execution_count="72">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co">## hide</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="ggplot-5" class="level2">
+<h2 class="anchored" data-anchor-id="ggplot-5">ggplot</h2>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="plotnine-6" class="level2">
+<h2 class="anchored" data-anchor-id="plotnine-6">plotnine</h2>
+</section>
+<section id="altair-6" class="level2">
+<h2 class="anchored" data-anchor-id="altair-6">altair</h2>
+</section>
+</section>
+<section id="add-annotations" class="level1">
+<h1>Add annotations</h1>
+<div class="cell" data-execution_count="73">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co">## hide</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="ggplot-6" class="level2">
+<h2 class="anchored" data-anchor-id="ggplot-6">ggplot</h2>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="plotnine-7" class="level2">
+<h2 class="anchored" data-anchor-id="plotnine-7">plotnine</h2>
+</section>
+<section id="altair-7" class="level2">
+<h2 class="anchored" data-anchor-id="altair-7">altair</h2>
+</section>
+</section>
+<section id="work-with-small-multiples" class="level1">
+<h1>Work with small multiples</h1>
+<div class="cell" data-execution_count="74">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co">## hide</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="ggplot-7" class="level2">
+<h2 class="anchored" data-anchor-id="ggplot-7">ggplot</h2>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="plotnine-8" class="level2">
+<h2 class="anchored" data-anchor-id="plotnine-8">plotnine</h2>
+</section>
+<section id="altair-8" class="level2">
+<h2 class="anchored" data-anchor-id="altair-8">altair</h2>
+</section>
+</section>
+<section id="do-something-else-entirely" class="level1">
+<h1>Do something else entirely</h1>
+<div class="cell" data-execution_count="75">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co">## hide</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="ggplot-8" class="level2">
+<h2 class="anchored" data-anchor-id="ggplot-8">ggplot</h2>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="plotnine-9" class="level2">
+<h2 class="anchored" data-anchor-id="plotnine-9">plotnine</h2>
+</section>
+<section id="altair-9" class="level2">
+<h2 class="anchored" data-anchor-id="altair-9">altair</h2>
+</section>
+</section>
+<section id="make-a-dumbbell-chart" class="level1">
+<h1>Make a dumbbell chart</h1>
+<section id="ggplot-9" class="level2">
+<h2 class="anchored" data-anchor-id="ggplot-9">ggplot</h2>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Prepare data</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>dumbbell_df <span class="ot">&lt;-</span> gapminder <span class="sc">%&gt;%</span></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">1967</span> <span class="sc">|</span> year <span class="sc">==</span> <span class="dv">2007</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(country, year, lifeExp) <span class="sc">%&gt;%</span></span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">spread</span>(year, lifeExp) <span class="sc">%&gt;%</span></span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gap =</span> <span class="st">`</span><span class="at">2007</span><span class="st">`</span> <span class="sc">-</span> <span class="st">`</span><span class="at">1967</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(gap)) <span class="sc">%&gt;%</span></span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>)</span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(hist_df, <span class="fu">aes</span>(lifeExp)) <span class="sc">+</span></span>
+<span id="cb58-11"><a href="#cb58-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">5</span>, <span class="at">colour =</span> <span class="st">"white"</span>, <span class="at">fill =</span> <span class="st">"#1380A1"</span>) <span class="sc">+</span></span>
+<span id="cb58-12"><a href="#cb58-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">colour=</span><span class="st">"#333333"</span>) <span class="sc">+</span></span>
+<span id="cb58-13"><a href="#cb58-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bbc_style</span>() <span class="sc">+</span></span>
+<span id="cb58-14"><a href="#cb58-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">35</span>, <span class="dv">95</span>),</span>
+<span id="cb58-15"><a href="#cb58-15" aria-hidden="true" tabindex="-1"></a>                     <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">40</span>, <span class="dv">90</span>, <span class="at">by =</span> <span class="dv">10</span>),</span>
+<span id="cb58-16"><a href="#cb58-16" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"40"</span>, <span class="st">"50"</span>, <span class="st">"60"</span>, <span class="st">"70"</span>, <span class="st">"80"</span>, <span class="st">"90 years"</span>)) <span class="sc">+</span></span>
+<span id="cb58-17"><a href="#cb58-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"How life expectancy varies"</span>,</span>
+<span id="cb58-18"><a href="#cb58-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Distribution of life expectancy in 2007"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="plotnine-10" class="level2">
+<h2 class="anchored" data-anchor-id="plotnine-10">plotnine</h2>
+<p>Not available with <code>plotnine</code>.</p>
+</section>
+<section id="altair-10" class="level2">
+<h2 class="anchored" data-anchor-id="altair-10">altair</h2>
+<div class="cell" data-execution_count="139">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>dumbbell_chart_altair <span class="op">=</span> (</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>alt.Chart(dumbbell_chart_df).</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>    mark_rule()</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>dumbbell_chart_altair</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="139">
+<pre><code>()</code></pre>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

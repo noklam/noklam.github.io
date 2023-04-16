@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2020-03-21">
+<meta name="description" content="My first silver medal on Kaggles Competition - Bengali Image Classification Competition. 10 lessons learn!">
+
+<title>noklam - Lesson learnt from Kaggle - Bengali Image Classification Competition</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-83544344-5', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="noklam - Lesson learnt from Kaggle - Bengali Image Classification Competition">
+<meta property="og:description" content="My first silver medal on Kaggles Competition - Bengali Image Classification Competition. 10 lessons learn!">
+<meta property="og:image" content="https://github.com/noklam.github.io/archive/posts/images/bengali_00_header.png">
+<meta property="og:site-name" content="noklam">
+<meta name="twitter:title" content="noklam - Lesson learnt from Kaggle - Bengali Image Classification Competition">
+<meta name="twitter:description" content="My first silver medal on Kaggles Competition - Bengali Image Classification Competition. 10 lessons learn!">
+<meta name="twitter:image" content="https://github.com/noklam.github.io/archive/posts/images/bengali_00_header.png">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">noklam</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog/index.html">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../archive/index.html">
+ <span class="menu-text">Archive</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/noklam"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Lesson learnt from Kaggle - Bengali Image Classification Competition</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blog/" class="sidebar-item-text sidebar-link">Blog</a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-classification-task" id="toc-the-classification-task" class="nav-link active" data-scroll-target="#the-classification-task">The Classification Task</a>
+  <ul>
+  <li><a href="#evaluation-metrics" id="toc-evaluation-metrics" class="nav-link" data-scroll-target="#evaluation-metrics">Evaluation Metrics</a></li>
+  <li><a href="#model-bigger-still-better" id="toc-model-bigger-still-better" class="nav-link" data-scroll-target="#model-bigger-still-better">Model (Bigger still better)</a></li>
+  <li><a href="#augmentation" id="toc-augmentation" class="nav-link" data-scroll-target="#augmentation">Augmentation</a>
+  <ul class="collapse">
+  <li><a href="#cutmix-mixup" id="toc-cutmix-mixup" class="nav-link" data-scroll-target="#cutmix-mixup">CutMix &amp; MixUp</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#logging-of-experiment" id="toc-logging-of-experiment" class="nav-link" data-scroll-target="#logging-of-experiment">Logging of Experiment</a>
+  <ul>
+  <li><a href="#hydra" id="toc-hydra" class="nav-link" data-scroll-target="#hydra">Hydra</a></li>
+  <li><a href="#wandb" id="toc-wandb" class="nav-link" data-scroll-target="#wandb">Wandb</a></li>
+  </ul></li>
+  <li><a href="#stochastic-weight-averaging" id="toc-stochastic-weight-averaging" class="nav-link" data-scroll-target="#stochastic-weight-averaging">Stochastic Weight Averaging</a></li>
+  <li><a href="#image.png" id="toc-image.png" class="nav-link" data-scroll-target="#image.png"><img src="https://github.com/noklam/mediumnok/blob/master/_notebooks/nb_img/bengali_5_swa.png?raw=true" title="Stochastic Weight Averaging" class="img-fluid" alt="image.png"></a></li>
+  <li><a href="#larger-is-better-image-size" id="toc-larger-is-better-image-size" class="nav-link" data-scroll-target="#larger-is-better-image-size">Larger is better (image size)</a></li>
+  <li><a href="#debug-checkpoint" id="toc-debug-checkpoint" class="nav-link" data-scroll-target="#debug-checkpoint">Debug &amp; Checkpoint</a></li>
+  <li><a href="#use-auxiliary-label" id="toc-use-auxiliary-label" class="nav-link" data-scroll-target="#use-auxiliary-label">Use auxiliary label</a></li>
+  <li><a href="#weight-loss" id="toc-weight-loss" class="nav-link" data-scroll-target="#weight-loss">Weight loss</a></li>
+  <li><a href="#find-a-teammate" id="toc-find-a-teammate" class="nav-link" data-scroll-target="#find-a-teammate">Find a teammate!</a></li>
+  <li><a href="#pretrain-model" id="toc-pretrain-model" class="nav-link" data-scroll-target="#pretrain-model">Pretrain Model</a></li>
+  <li><a href="#if-the-code-works-dont-touch-it" id="toc-if-the-code-works-dont-touch-it" class="nav-link" data-scroll-target="#if-the-code-works-dont-touch-it">If the code works, don’t touch it</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/noklam/noklam.github.io/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Lesson learnt from Kaggle - Bengali Image Classification Competition</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">python</div>
+    <div class="quarto-category">kaggle</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    My first silver medal on Kaggles Competition - Bengali Image Classification Competition. 10 lessons learn!
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">March 21, 2020</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<p>I have teamed up with a friend to participate in the <a href="https://www.kaggle.com/c/bengaliai-cv19/?utm_medium=email&amp;utm_source=intercom&amp;utm_campaign=bengaliai-email-launch">Bengali Image Classification Competition</a>. We struggled to get a high rank in the Public leaderboard throughout the competition. In the end, the result is a big surprise to everyone as the leaderboard shook a lot.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<figure class="figure">
+<img src="https://github.com/noklam/mediumnok/blob/master/_notebooks/nb_img/bengali_0_public_lb.png?raw=true" title="Public Leaderboard has a much higher score, >0.99 recall!" class="img-fluid figure-img">
+</figure>
+<p></p><figcaption class="figure-caption">Public Leaderboard</figcaption><p></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<figure class="figure">
+<img src="https://github.com/noklam/mediumnok/blob/master/_notebooks/nb_img/bengali_1_private_lb.png?raw=true" title="Note that the rank shook for over 1000!" class="img-fluid figure-img">
+</figure>
+<p></p><figcaption class="figure-caption">Public Leaderboard</figcaption><p></p>
+</figure>
+</div>
+<p>The final private score was much lower than the public score. It suggests that most participants are over-fitting Public leaderboard.</p>
+<section id="the-classification-task" class="level1">
+<h1>The Classification Task</h1>
+<p>This is an image classification competition. We need to predict 3 parts of <strong>Bengali</strong> characters <code>root</code>, <code>consonant</code> and <code>vowel</code>. It is a typical classification tasks like the <strong>MNIST</strong> dataset.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<figure class="figure">
+<img src="https://github.com/noklam/mediumnok/blob/master/_notebooks/nb_img/bengali_2_grapheme.png?raw=true" title="Examples of characters" class="img-fluid figure-img">
+</figure>
+<p></p><figcaption class="figure-caption">Grapheme example</figcaption><p></p>
+</figure>
+</div>
+<section id="evaluation-metrics" class="level2">
+<h2 class="anchored" data-anchor-id="evaluation-metrics">Evaluation Metrics</h2>
+<p>The competition use macro-recall as the evaluation metric. In general, people get &gt;96% recall in training, the tops are even getting &gt;99% recall.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>python</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sklearn.metrics</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>scores <span class="op">=</span> []</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> component <span class="kw">in</span> [<span class="st">'grapheme_root'</span>, <span class="st">'consonant_diacritic'</span>, <span class="st">'vowel_diacritic'</span>]:</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    y_true_subset <span class="op">=</span> solution[solution[component] <span class="op">==</span> component][<span class="st">'target'</span>].values</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    y_pred_subset <span class="op">=</span> submission[submission[component] <span class="op">==</span> component][<span class="st">'target'</span>].values</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    scores.append(sklearn.metrics.recall_score(</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        y_true_subset, y_pred_subset, average<span class="op">=</span><span class="st">'macro'</span>))</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>final_score <span class="op">=</span> np.average(scores, weights<span class="op">=</span>[<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="model-bigger-still-better" class="level2">
+<h2 class="anchored" data-anchor-id="model-bigger-still-better">Model (Bigger still better)</h2>
+<p>We start with <code>xresnet50</code>, which is a relatively small model. As we have the assumption that this classification task is a very standard task, therefore the difference of model will not be the most important one. Thus we pick xresnet50 as it has a good performance in terms of accuracy and train relatively fast.</p>
+<p>Near the end of the competition, we switch to a larger model <code>se-resnext101</code>. It requires triple training time plus we have to scale down the batch size as it does not fit into the GPU memory. Surprisingly (maybe not surprising to everyone), the bigger model did boost the performance more than I expected with ~0.3-0.5% recall. It is a big improvement as the recall is very high (~0.97), in other words, it reduces <strong>~10%</strong> error solely by just using a better model, not bad!</p>
+</section>
+<section id="augmentation" class="level2">
+<h2 class="anchored" data-anchor-id="augmentation">Augmentation</h2>
+<p>There are never “enough” data for deep learning, so we always try our best to collect more data. Since we cannot collect more data, we need data augmentation. We start with rotation + scale. We also find <strong>MixUp</strong> and <strong>CutMix</strong> is very effective to boost the performance. It also gives us roughly <strong>10%</strong> boost initially from 0.96 -&gt; 0.964 recall.</p>
+<section id="cutmix-mixup" class="level3">
+<h3 class="anchored" data-anchor-id="cutmix-mixup"><a href="https://arxiv.org/abs/1905.04899">CutMix</a> &amp; <a href="https://arxiv.org/pdf/1710.09412.pdf">MixUp</a></h3>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<figure class="figure">
+<img src="https://github.com/noklam/mediumnok/blob/master/_notebooks/nb_img/bengali_3_data_aug.png?raw=true" title="Augmentation Example" class="img-fluid figure-img">
+</figure>
+<p></p><figcaption class="figure-caption">Example of Augmentation</figcaption><p></p>
+</figure>
+</div>
+<p><em>Mixup</em> is simple, if you know about photography, it is similar to have double exposure of your photos. It overlays two images (cat+dog in this case) by sampling weights. So instead of prediction P(dog) = 1, the new target could become P(dog) = 0.8 and P(cat) = 0.2.</p>
+<p><em>CutMix</em> shares a similar idea, instead of overlay 2 images, it crops out a certain ratio of the image and replaces it with another one.</p>
+<p>It always surprises me that these augmented data does not make much sense to a human, but it is very effective to improve model accuracy and reduce overfitting empirically.</p>
+</section>
+</section>
+</section>
+<section id="logging-of-experiment" class="level1">
+<h1>Logging of Experiment</h1>
+<p>I normally just log my experiment with a simple CSV and some printing message. This start to get tedious when there are more than 1 people to work. It is important to communicate the results of experiments. I explore <code>Hydra</code> and <code>wandb</code> in this competition and they are very useful.</p>
+<section id="hydra" class="level2">
+<h2 class="anchored" data-anchor-id="hydra"><a href="https://hydra.cc/">Hydra</a></h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://github.com/noklam/mediumnok/blob/master/_notebooks/nb_img/bengali_4_hydra.png?raw=true" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Hydra for configuration composition</figcaption><p></p>
+</figure>
+</div>
+<p>It is often a good idea to make your experiment configurable. We use <code>Hydra</code> for this purpose and it is useful to compose different configuration group. By making your hyper-paramters configurable, you can define an experiment by configuration files and run multiple experiments. By logging the configuration with the training statistics, it is easy to do cross-models comparison and find out which configuration is useful for your model.</p>
+<p>I have written <a href="https://mediumnok.ml/coding/ml/2020/02/08/Config-Composition-with-Hydra-for-Machine-Learning-Experiments.html">an short example</a> for how to use <strong>Hydra</strong>.</p>
+</section>
+<section id="wandb" class="level2">
+<h2 class="anchored" data-anchor-id="wandb"><a href="https://www.wandb.com/">Wandb</a></h2>
+<p><strong>wandb</strong> (Weight &amp; Biases) does a few things. It provides built-in functions that automatically log all your model statistics, you can also log your custom metrics with simple functions.</p>
+<ul>
+<li>Compare the configuration of different experiments to find out the model with the best performance.</li>
+<li>Built-in function for logging model weights and gradient for debugging purpose.</li>
+<li>Log any metrics that you want</li>
+</ul>
+<p>All of these combined to make collaboration experience better. It is really important to sync the progress frequently and getting everyone results in a single platform makes these conversations easier.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<figure class="figure">
+<img src="https://github.com/noklam/mediumnok/blob/master/_notebooks/nb_img/bengali_06.jpg?raw=true" title="Screenshot of wandb UI for cross model comparison" class="img-fluid figure-img">
+</figure>
+<p></p><figcaption class="figure-caption">image.png</figcaption><p></p>
+</figure>
+</div>
+</section>
+</section>
+<section id="stochastic-weight-averaging" class="level1">
+<h1><a href="https://pytorch.org/blog/stochastic-weight-averaging-in-pytorch/">Stochastic Weight Averaging</a></h1>
+<p>This is a simple yet effective technique which gives about 0.3-0.4% boost to my model. In simple words, it takes <strong>snapshots</strong> of the model weights during training and takes an average at the end. It provides a cheap way to do models ensemble while you are only training 1 model. This is important for this competition as it allows me to keep training time short enough to allow feedback within hours and reduce over-fitting.)</p>
+</section>
+<section id="image.png" class="level1">
+<h1><img src="https://github.com/noklam/mediumnok/blob/master/_notebooks/nb_img/bengali_5_swa.png?raw=true" title="Stochastic Weight Averaging" class="img-fluid" alt="image.png"></h1>
+</section>
+<section id="larger-is-better-image-size" class="level1">
+<h1>Larger is better (image size)</h1>
+<p>We downsample our image size to 128x128 throughout the competition, as it makes the model train faster and we believe most technique should be transferable to larger image size. It is important to keep your feedback loop short enough (hours if not days). You want your training data as small as possible while keeping them transferable to your full dataset. Once we scale our image to full size, it takes almost 20 hours to train a single model, and we only have little chance to tune the hyper-parameters before the competition end.</p>
+</section>
+<section id="debug-checkpoint" class="level1">
+<h1>Debug &amp; Checkpoint</h1>
+<p>There was a time we develop our model separately and we didn’t sync our code for a while. We refactor our code during the time and it was a huge mistake. It turns out our pre-refactor code trains much better model and we introduce some unknown bug. It is almost impossible to find out as we change multiple things. It is so hard to debug a neural network and testing it thoroughly is important. Injecting a large amount of code may help you to run an experiment earlier, but you may pay much more time to debug it afterwards.</p>
+<p>I think this is applicable even if you are working alone. * Keep your changes small. * Establish a baseline early, always do a regression test after a new feature introduced (especially after code refactoring) * Create checkpoint to rollback anytime, especially if you are not working on it every day.</p>
+<p>Implementation is the key of Kaggle competition (in real life too). It does not matter how great your model is, a tiny little bug could have damaged your model silently</p>
+</section>
+<section id="use-auxiliary-label" class="level1">
+<h1>Use auxiliary label</h1>
+<p><img src="https://github.com/noklam/mediumnok/blob/master/_notebooks/nb_img/bengali_7.png?raw=true" title="The extra grapheme label" class="img-fluid" alt="image.png"> As mentioned earlier, this competition requires to predict the <code>root</code>, <code>vowel</code> and the <code>consonant</code> part. In the training data, they actually provide the <code>grapheme</code> too. Lots of people saying that if you train with the <code>grapheme</code>, it improves the model greatly and get the recall &gt;98% easily.</p>
+<p>This is something we could not reproduce throughout the competition, we tried it in the very last minute but it does not seem to improve our model. It turns out lots of people are overfitting the data, as the testing dataset has much more unseen character.</p>
+<p>But it is still a great remark that training with labels that is not your final desired output could still be very useful.</p>
+</section>
+<section id="weight-loss" class="level1">
+<h1>Weight loss</h1>
+<p>The distribution of the training dataset is very imbalance, but to get a good result, we need to predict every single class accurately (macro recall). To deal with this issue, we choose to use class weights, where a higher weight would be applied to rare samples. We don’t have an ablation study for this, but it seems to help close the gap between accuracy &amp; recall and allows us to train the model slightly better.</p>
+</section>
+<section id="find-a-teammate" class="level1">
+<h1>Find a teammate!</h1>
+<p>Lastly, please go and find a teammate if you can. It is very common to start a Kaggle competition, but not so easy to finish them. I have stopped for a month during the competition due to my job. It is really hard to get back to the competition after you stopped for so long. Getting a teammate helps to motivate you and in the end, it is a great learning experience for both of us.</p>
+</section>
+<section id="pretrain-model" class="level1">
+<h1>Pretrain Model</h1>
+<p>We also tried to use a pretrained model, as it allows shorter training and gives better performance by transfer learning (Using weights learn from a large dataset to as initial weight). It also gives our model a bit of improvement.</p>
+<ul>
+<li>Finetune the model head, while keeping other layers freeze (except BatchNorm layer).</li>
+<li>Unfreeze the model, train all the layers together.</li>
+</ul>
+<p>I also tried training the model directly with discriminating learning rate while not freezing any layer at all. It performs similarly to freezing fine-tuning , so I end up just start training the entire model from the beginning.</p>
+</section>
+<section id="if-the-code-works-dont-touch-it" class="level1">
+<h1>If the code works, don’t touch it</h1>
+<p>This is probably not a good habit usually, but I suggest not to do it for a competition. We spent lots of time for debugging our code after code refactoring and end up just rolling back to an older commit and cherry-picks new features. In a competition, you don’t have enough time to test everything. You do not need a nice abstract class for all your features, some refactoring to keep your function/class clean is probably needed, but do not overspend your time on it. It is even common to jump between frameworks (you may find other’s Kernel useful), so it is not possible to structure your code perfectly.</p>
+<ul>
+<li>If someone has create a working submission script, use it!</li>
+<li>If someone has create a working pre-processing function, use it!</li>
+</ul>
+<p>Don’t spend time on trying to optimize these code unless it is necessary, it is often not worth it in a competition context. You should focus on adding new features, trying out new model, testing with new augmentation technique instead.</p>
+</section>
+<section id="summary" class="level1">
+<h1>Summary</h1>
+<p>This is a great learning experience and refreshes some of my outdated computer vision model knowledge. If you have never joined a competition, find a friend and get started. If you have just finished one, try writing it out and share your experience. 😉</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
